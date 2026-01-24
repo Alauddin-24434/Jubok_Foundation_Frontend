@@ -344,7 +344,7 @@ export default function LandingPage() {
                 {language === "en" ? "বাংলা" : "English"}
               </button>
 
-              <Link href="/auth/login">
+              <Link href="/login">
                 <Button
                   variant="outline"
                   size="sm"
@@ -353,7 +353,7 @@ export default function LandingPage() {
                   {t.signIn}
                 </Button>
               </Link>
-              <Link href="/auth/signup">
+              <Link href="/signup">
                 <Button
                   size="sm"
                   className="bg-primary hover:bg-primary/90 text-primary-foreground"

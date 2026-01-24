@@ -1,23 +1,24 @@
-import React from "react"
-import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
-import { Analytics } from '@vercel/analytics/next'
-import './globals.css'
+import React from "react";
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
+import "./globals.css";
+import ReduxProvider from "@/components/shared/ReduxProvider";
 
 const geist = Geist({
   subsets: ["latin"],
   variable: "--font-sans",
-})
+});
 
 const geistMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
-})
+});
 
 export const metadata: Metadata = {
-  title: 'Alhamdulillah Foundation | Collaborative Investment Platform',
+  title: "Alhamdulillah Foundation | Collaborative Investment Platform",
   description:
-    'A secure platform for managing community investment projects including agriculture, fish farming, and real estate development.',
+    "A secure platform for managing community investment projects including agriculture, fish farming, and real estate development.",
   // generator: 'v0.app',
   // icons: {
   //   icon: [
@@ -27,21 +28,23 @@ export const metadata: Metadata = {
   //   ],
   //   apple: '/apple-icon.png',
   // },
-}
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}
       >
-        {children}
-        <Analytics />
+        <ReduxProvider>
+          {children}
+          {/* <Analytics /> */}
+        </ReduxProvider>
       </body>
     </html>
-  )
+  );
 }
