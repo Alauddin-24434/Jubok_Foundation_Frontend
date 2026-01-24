@@ -30,15 +30,17 @@ export default function CloudinaryUpload({
     setUploading(true)
     const formData = new FormData()
     formData.append('file', file)
+    formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || '')
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/upload/image`, {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'Authorization': `Bearer ${token}`
+      const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+        {
+          method: 'POST',
+          body: formData,
         }
-      })
+      )
 
       if (!response.ok) throw new Error('Upload failed')
 
@@ -46,6 +48,7 @@ export default function CloudinaryUpload({
       onUploadSuccess(result.secure_url)
       toast.success('Image uploaded successfully')
     } catch (error) {
+      console.error('Upload Error:', error)
       toast.error('Failed to upload image')
     } finally {
       setUploading(false)
