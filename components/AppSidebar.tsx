@@ -66,10 +66,27 @@ export const sidebarItems: SidebarItem[] = [
     roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MODERATOR],
   },
 
-  // ===== Inventory =====
+   // ===== Banners =====
   {
-    title: "Inventory",
-    url: "/dashboard/inventory",
+    title: "Banners",
+    url: "/dashboard/banners",
+    icon: FolderOpen,
+    roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MODERATOR],
+  },
+
+     // ===== Members =====
+  {
+    title: "Members",
+    url: "/dashboard/members",
+    icon: FolderOpen,
+    roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MODERATOR],
+  },
+
+
+  // ===== Payments =====
+  {
+    title: "payments",
+    url: "/dashboard/payments",
     icon: Boxes,
     roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MODERATOR],
   },
@@ -93,13 +110,6 @@ export const sidebarItems: SidebarItem[] = [
     roles: [UserRole.SUPER_ADMIN],
   },
 
-  // ===== Role & Permission =====
-  {
-    title: "Roles & Permissions",
-    url: "/dashboard/roles",
-    icon: ShieldCheck,
-    roles: [UserRole.SUPER_ADMIN],
-  },
 
   // ===== Settings =====
   {
