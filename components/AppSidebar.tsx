@@ -74,34 +74,8 @@ export const sidebarItems: SidebarItem[] = [
     roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MODERATOR],
   },
 
-  // ===== Categories =====
-  {
-    title: "Categories",
-    url: "/dashboard/categories",
-    icon: Layers,
-    roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
-  },
-
-  // ===== Suppliers =====
-  {
-    title: "Suppliers",
-    url: "/dashboard/suppliers",
-    icon: Truck,
-    roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
-  },
-
-  // ===== Orders =====
-  {
-    title: "Orders",
-    url: "/dashboard/orders",
-    icon: ShoppingCart,
-    roles: [
-      UserRole.SUPER_ADMIN,
-      UserRole.ADMIN,
-      UserRole.MODERATOR,
-      UserRole.USER,
-    ],
-  },
+ 
+ 
 
   // ===== Reports =====
   {
