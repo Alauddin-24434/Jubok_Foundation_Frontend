@@ -225,14 +225,13 @@ return NextResponse.json({
 
 ---
 
-## Payment Integration (SSLCommerz)
+## Payment Integration (Bkash Manual)
 
-The frontend includes a payments page ready for SSLCommerz integration:
+The frontend implements a manual verification flow:
 
-1. Configure SSLCommerz credentials in admin settings
-2. Implement payment initiation in `/app/api/payments/`
-3. Handle payment callbacks from SSLCommerz
-4. Update payment status in your database
+1.  **Payment Page**: `/auth/payment-required` collects transaction details.
+2.  **API**: Calls `verifyPayment` mutation (`/api/payments/verify`).
+3.  **Confirmation**: Redirects to `/auth/payment-success` pending admin review.
 
 ---
 

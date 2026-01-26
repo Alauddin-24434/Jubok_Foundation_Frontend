@@ -1,0 +1,149 @@
+{
+  "brand": {
+    "name": "Alhamdulillah Foundation",
+    "welcome": "Welcome to Alhamdulillah Foundation",
+    "copyright": "© 2026 Alhamdulillah Foundation. All rights reserved.",
+    "lastUpdated": "Last updated"
+  },
+
+  "common": {
+    "home": "Home",
+    "projects": "Projects",
+    "about": "About Us",
+    "contact": "Contact",
+    "login": "Login",
+    "logout": "Logout",
+    "register": "Register",
+    "dashboard": "Dashboard",
+    "save": "Save",
+    "cancel": "Cancel",
+    "update": "Update",
+    "loading": "Loading...",
+    "search": "Search",
+    "filter": "Filter",
+    "all": "All",
+    "status": "Status",
+    "category": "Category",
+    "details": "Details",
+    "noProjects": "No projects found.",
+    "exploreDesc": "Explore our community investment opportunities",
+    "resetFilters": "Reset Filters",
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {{page}} of {{total}}",
+    "clearAll": "Clear all filters",
+    "themeLight": "🌤 Light",
+    "themeDark": "🌙 Dark",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service"
+  },
+
+  "hero": {
+    "getStarted": "Get Started"
+  },
+
+  "about": {
+    "title": "Our Mission for Sustainable Communities",
+    "desc": "Alhamdulillah Foundation is dedicated to empowering communities through transparent and collaborative investment opportunities. We bridge the gap between small investors and large-scale agricultural and real estate projects.",
+    "membersCount": "50+ Members",
+    "membersDesc": "Strong growing community",
+    "projectsCount": "10+ Projects",
+    "projectsDesc": "Active ventures managed",
+    "visionLink": "Learn more about our vision",
+    "transparency": "100%",
+    "transparencyDesc": "Transparency & Ethical Management"
+  },
+
+  "footer": {
+    "quickLinks": "Quick Links",
+    "support": "Support",
+    "agriculture": "Agriculture Projects",
+    "fishFarming": "Fish Farming",
+    "realEstate": "Real Estate",
+    "allOpps": "All Opportunities",
+    "howItWorks": "How it Works",
+    "faqs": "FAQs",
+    "supportCenter": "Support Center"
+  },
+
+  "cta": {
+    "title": "Empower Communities Through Your Contribution",
+    "desc": "Whether through investment or direct support, your involvement helps us expand our reach and impact. Join our collaborative platform today.",
+    "joinInvestor": "Join as Investor",
+    "supportCause": "Support Our Cause"
+  },
+
+  "banner": {
+    "title1": "Collaborative Wealth Building",
+    "desc1": "Join 50+ members managing investment projects together with complete transparency",
+    "title2": "Secure Investment Management",
+    "desc2": "Track every transaction with blockchain-backed security and real-time auditing",
+    "title3": "Grow Your Community",
+    "desc3": "From agriculture to real estate, unlock opportunities that transform lives"
+  },
+
+  "project": {
+    "featured": "Featured Projects",
+    "exploreAll": "Explore All Projects",
+    "join": "Join Project",
+    "raised": "Raised",
+    "target": "Target",
+    "collected": "Collected",
+    "members": "Members"
+  },
+
+  "team": {
+    "title": "Management Committee",
+    "desc": "Meet the people responsible for managing and supervising our projects",
+    "roles": {
+      "president": "President",
+      "secretary": "General Secretary",
+      "treasurer": "Treasurer",
+      "member": "Executive Member"
+    }
+  },
+
+  "contact": {
+    "title": "Contact Us",
+    "desc": "Reach out to us for any inquiries or support regarding our projects.",
+    "addressLabel": "Address",
+    "phoneLabel": "Phone",
+    "emailLabel": "Email",
+    "addressValue": "Dhaka, Bangladesh",
+    "button": "Send Message",
+    "name": "Name",
+    "message": "Message",
+    "sending": "Sending...",
+    "success": "Message sent successfully!",
+    "error": "Failed to send message."
+  },
+
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "questions": [
+      {
+        "q": "How can I join a project?",
+        "a": "You can join a project by registering an account and clicking the 'Join Project' button on any active project card."
+      },
+      {
+        "q": "Is my investment secure?",
+        "a": "We ensure maximum transparency through collaborative management and real-time tracking of all project activities."
+      },
+      {
+        "q": "Who manages the projects?",
+        "a": "Each project is managed by a committee of members elected by the community, overseen by the foundation."
+      }
+    ]
+  },
+
+  "legal": {
+    "privacy": {
+      "title": "Privacy Policy",
+      "content": "Your privacy is important to us. It is Alhamdulillah Foundation's policy to respect your privacy regarding any information we may collect from you across our website."
+    },
+    "terms": {
+      "title": "Terms of Service",
+      "content": "By accessing our website, you are agreeing to be bound by these terms of service, all applicable laws and regulations."
+    }
+  }
+}

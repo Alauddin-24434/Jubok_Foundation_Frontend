@@ -21,10 +21,11 @@ export default function ProjectsPage() {
   const { data: projects, isLoading } = useGetProjectsQuery({
     status: filterStatus === 'all' ? undefined : filterStatus
   })
+  
 
   const [deleteProject] = useDeleteProjectMutation()
 
-  const filteredProjects = projects?.filter((project: any) => {
+  const filteredProjects = projects?.data?.filter((project: any) => {
     const matchesSearch = project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       project.location.toLowerCase().includes(searchQuery.toLowerCase())
     return matchesSearch
@@ -84,13 +85,13 @@ export default function ProjectsPage() {
               <div className="flex justify-between items-center text-sm">
                 <span className="text-foreground/60">Funding Progress</span>
                 <span className="font-medium text-foreground">
-                  {Math.round((project.totalInvestment / project.amount) * 100)}%
+                  {Math.round(((project.raisedAmount || 0) / (project.targetAmount || 1)) * 100)}%
                 </span>
               </div>
               <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-primary transition-all"
-                  style={{ width: `${Math.min((project.totalInvestment / project.amount) * 100, 100)}%` }}
+                   className="h-full bg-primary transition-all"
+                   style={{ width: `${Math.min(((project.raisedAmount || 0) / (project.targetAmount || 1)) * 100, 100)}%` }}
                 />
               </div>
             </div>
@@ -98,15 +99,15 @@ export default function ProjectsPage() {
             {/* Stats */}
             <div className="grid grid-cols-3 gap-2 text-center text-sm">
               <div>
-                <p className="text-foreground font-semibold">৳{(project.totalInvestment / 1000).toFixed(0)}k</p>
+                <p className="text-foreground font-semibold">৳{((project.raisedAmount || 0) / 1000).toFixed(0)}k</p>
                 <p className="text-xs text-foreground/60">Raised</p>
               </div>
               <div>
-                <p className="text-foreground font-semibold">{project.memberCount}</p>
+                <p className="text-foreground font-semibold">{project.members?.length || project.memberCount || 0}</p>
                 <p className="text-xs text-foreground/60">Members</p>
               </div>
               <div>
-                <p className="text-foreground font-semibold">৳{(project.amount / 1000).toFixed(0)}k</p>
+                <p className="text-foreground font-semibold">৳{((project.targetAmount || 0) / 1000).toFixed(0)}k</p>
                 <p className="text-xs text-foreground/60">Target</p>
               </div>
             </div>
@@ -173,9 +174,9 @@ export default function ProjectsPage() {
 
         {/* Projects Grid */}
         {filteredProjects.length > 0 ? (
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-4 gap-6">
             {filteredProjects.map((project: any) => (
-              <ProjectCard key={project.id} project={project} />
+              <ProjectCard key={project._id} project={project} />
             ))}
           </div>
         ) : (

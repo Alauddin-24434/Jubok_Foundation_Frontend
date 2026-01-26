@@ -4,6 +4,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import ReduxProvider from "@/components/shared/ReduxProvider";
+import { I18nProvider } from "@/components/shared/I18nProvider";
+import { ThemeProvider } from "@/components/shared/ThemeProvider";
+import Script from "next/script";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -19,15 +22,21 @@ export const metadata: Metadata = {
   title: "Alhamdulillah Foundation | Collaborative Investment Platform",
   description:
     "A secure platform for managing community investment projects including agriculture, fish farming, and real estate development.",
-  // generator: 'v0.app',
-  // icons: {
-  //   icon: [
-  //     { url: '/icon-light-32x32.png', media: '(prefers-color-scheme: light)' },
-  //     { url: '/icon-dark-32x32.png', media: '(prefers-color-scheme: dark)' },
-  //     { url: '/icon.svg', type: 'image/svg+xml' },
-  //   ],
-  //   apple: '/apple-icon.png',
-  // },
+  keywords: "Alhamdulillah Foundation, Investment, Halal Investment, Agriculture, Fish Farming, Real Estate, Bangladesh",
+  authors: [{ name: "Alhamdulillah Foundation Team" }],
+  openGraph: {
+    title: "Alhamdulillah Foundation | Collaborative Investment Platform",
+    description: "Secure platform for community investment projects.",
+    url: "https://alhamdulillahfoundation.com",
+    siteName: "Alhamdulillah Foundation",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Alhamdulillah Foundation | Collaborative Investment Platform",
+    description: "Secure platform for community investment projects.",
+  },
 };
 
 export default function RootLayout({
@@ -37,13 +46,36 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <Script
+          async
+          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
+        />
+        <Script id="google-analytics">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}');
+          `}
+        </Script>
+      </head>
       <body
-       suppressHydrationWarning
+        suppressHydrationWarning
         className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}
       >
         <ReduxProvider>
-          {children}
-          {/* <Analytics /> */}
+          <I18nProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="light"
+              enableSystem
+              disableTransitionOnChange
+            >
+              {children}
+            </ThemeProvider>
+          </I18nProvider>
+          <Analytics />
         </ReduxProvider>
       </body>
     </html>

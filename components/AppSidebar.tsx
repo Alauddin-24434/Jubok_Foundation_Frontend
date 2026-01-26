@@ -34,6 +34,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
 import { useDispatch } from "react-redux";
 import { logout, UserRole } from "@/redux/features/auth/authSlice";
+import { useTranslation } from "react-i18next";
+import { Button } from "@/components/ui/button";
 
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
@@ -94,12 +96,14 @@ export const sidebarItems: SidebarItem[] = [
  
  
 
-  // ===== Reports =====
+
+
+  // ===== Membership Approvals (Admin) =====
   {
-    title: "Reports",
-    url: "/dashboard/reports",
-    icon: BarChart3,
-    roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
+    title: "Pending Approvals",
+    url: "/dashboard/pending-members",
+    icon: ShieldCheck,
+    roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MODERATOR],
   },
 
   // ===== User Management =====
@@ -128,14 +132,14 @@ export const sidebarItems: SidebarItem[] = [
 interface AppSidebarProps {
   user: {
     name: string;
-    role: "admin" | "user";
+    role: UserRole;
     profilePhoto?: string;
   };
 }
 
 export function AppSidebar({ user }: AppSidebarProps) {
   const dispatch = useDispatch();
-
+  const { t } = useTranslation();
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -151,47 +155,51 @@ export function AppSidebar({ user }: AppSidebarProps) {
     <Sidebar>
       {/* --- Profile Header Section --- */}
 
-      <SidebarHeader className="border-b border-sidebar-border pb-4 mb-2">
-        {/* Wrap the content with Link to make it clickable */}
+      <SidebarHeader className="border-b border-sidebar-border/50 pb-6 mb-2 px-6 pt-8 bg-sidebar-accent/5">
         <Link
-          // Dynamic route based on role
           href="/"
-          className="flex items-center gap-3 px-4 py-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors rounded-lg group"
+          className="flex items-center gap-4 hover:opacity-80 transition-opacity group"
         >
-          <Avatar className="h-10 w-10 border border-primary/20 shrink-0">
+          <Avatar className="h-12 w-12 border-2 border-primary/20 shrink-0 shadow-lg">
             <AvatarImage src={user?.profilePhoto} alt={user?.name} />
-            <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+            <AvatarFallback className="bg-primary text-primary-foreground font-bold">
               {user?.name?.charAt(0).toUpperCase() || "U"}
             </AvatarFallback>
           </Avatar>
 
           <div className="flex flex-col overflow-hidden text-left">
-            <span className="text-sm font-semibold truncate text-sidebar-foreground group-hover:text-primary transition-colors">
+            <span className="text-base font-bold truncate text-sidebar-foreground">
               {user?.name}
             </span>
-            <span className="text-xs text-muted-foreground capitalize">
+            <span className="text-xs text-primary font-medium uppercase tracking-wider">
               {user?.role}
             </span>
           </div>
         </Link>
       </SidebarHeader>
-      <SidebarContent>
+
+      <SidebarContent className="px-2">
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
+          <SidebarGroupLabel className="px-4 text-xs font-bold uppercase tracking-widest text-sidebar-foreground/40 mb-2">
+            {t("common.dashboard")}
+          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {sidebarItems
                 .filter((item) => item.roles.includes(user?.role))
                 .map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
-                      <a
+                    <SidebarMenuButton 
+                      asChild 
+                      className={`h-11 px-4 rounded-xl transition-all duration-200 hover:bg-primary/10 hover:text-primary active:scale-[0.98]`}
+                    >
+                      <Link
                         href={item.url}
-                        className="flex items-center space-x-2"
+                        className="flex items-center gap-3 font-medium"
                       >
                         <item.icon className="w-5 h-5" />
                         <span>{item.title}</span>
-                      </a>
+                      </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
@@ -199,17 +207,18 @@ export function AppSidebar({ user }: AppSidebarProps) {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      {/* --- Logout Footer Section --- */}
-      <SidebarFooter className="p-4 border-t border-sidebar-border">
+
+      <SidebarFooter className="p-4 border-t border-sidebar-border/50 bg-sidebar-accent/5">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
+            <Button
+              variant="destructive"
               onClick={handleLogout}
-              className="w-full text-red-500 bg-gray-50 border cursor-pointer hover:text-red-600 hover:bg-red-50/10 transition-colors"
+              className="w-full h-11 justify-start gap-3 rounded-xl font-bold bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground transition-all duration-300 shadow-sm"
             >
               <LogOut className="w-5 h-5" />
-              <span className="font-medium">Logout</span>
-            </SidebarMenuButton>
+              <span>{t("common.logout")}</span>
+            </Button>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>

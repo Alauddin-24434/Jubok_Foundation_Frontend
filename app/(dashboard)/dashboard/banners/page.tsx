@@ -150,7 +150,7 @@ export default function BannersPage() {
                     <SelectValue placeholder="Select project" />
                   </SelectTrigger>
                   <SelectContent>
-                    {projects?.map((p: any) => (
+                    {projects?.data?.map((p: any) => (
                       <SelectItem key={p._id} value={p._id}>{p.name}</SelectItem>
                     ))}
                   </SelectContent>

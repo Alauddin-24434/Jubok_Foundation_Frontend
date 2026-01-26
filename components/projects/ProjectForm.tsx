@@ -32,10 +32,10 @@ export default function ProjectForm({ initialData, isEditing = false }: ProjectF
     videos: initialData?.videos || [''],
     startDate: initialData?.startDate ? new Date(initialData.startDate).toISOString().split('T')[0] : '',
     endDate: initialData?.endDate ? new Date(initialData.endDate).toISOString().split('T')[0] : '',
-    amount: initialData?.amount || 0,
+    intialInvestment: initialData?.intialInvestment || 0,
+    category: initialData?.category || 'Agriculture',
     location: initialData?.location || '',
     contactNumber: initialData?.contactNumber || '',
-    notice: initialData?.notice || '',
   })
 
   // Load draft from localStorage on mount (only for new projects)
@@ -76,10 +76,10 @@ export default function ProjectForm({ initialData, isEditing = false }: ProjectF
         videos: [''],
         startDate: '',
         endDate: '',
-        amount: 0,
+        intialInvestment: 0,
+        category: 'Agriculture',
         location: '',
         contactNumber: '',
-        notice: '',
       })
       toast.success('Draft cleared')
     }
@@ -91,7 +91,7 @@ export default function ProjectForm({ initialData, isEditing = false }: ProjectF
     // Filter out empty video URLs and sanitize data
     const cleanedData = {
       ...formData,
-      amount: Number(formData.amount),
+      intialInvestment: Number(formData.intialInvestment),
       videos: formData.videos.filter((v: string) => v.trim() !== ''),
       startDate: formData.startDate ? new Date(formData.startDate).toISOString() : undefined,
       endDate: formData.endDate ? new Date(formData.endDate).toISOString() : undefined,
@@ -167,16 +167,34 @@ export default function ProjectForm({ initialData, isEditing = false }: ProjectF
           />
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <label className="text-sm font-medium">Target Amount (৳)</label>
+            <label className="text-sm font-medium">Category</label>
+            <select 
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              value={formData.category} 
+              onChange={e => setFormData({...formData, category: e.target.value})}
+              required
+            >
+              <option value="Agriculture">Agriculture</option>
+              <option value="Fish Farming">Fish Farming</option>
+              <option value="Real Estate">Real Estate</option>
+              <option value="Technology">Technology</option>
+              <option value="Education">Education</option>
+            </select>
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Initial Investment (৳)</label>
             <Input 
               type="number"
-              value={formData.amount} 
-              onChange={e => setFormData({...formData, amount: parseInt(e.target.value)})}
+              value={formData.intialInvestment} 
+              onChange={e => setFormData({...formData, intialInvestment: parseInt(e.target.value)})}
               required 
             />
           </div>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6">
           <div className="space-y-2">
             <label className="text-sm font-medium">Start Date</label>
             <Input 
@@ -245,13 +263,6 @@ export default function ProjectForm({ initialData, isEditing = false }: ProjectF
           />
         </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Notice (Special Instructions)</label>
-          <Input 
-            value={formData.notice} 
-            onChange={e => setFormData({...formData, notice: e.target.value})}
-          />
-        </div>
       </Card>
 
       <div className="flex flex-col sm:flex-row justify-end gap-4">

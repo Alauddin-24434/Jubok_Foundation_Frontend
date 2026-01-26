@@ -39,8 +39,8 @@ export default function LoginPage() {
   return (
     <Card className="p-8">
       <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold mb-2">Alhamdulillah</h1>
-        <p className="text-foreground/60">Sign in to your account</p>
+        <h1 className="text-2xl font-bold mb-2">Member Login</h1>
+        <p className="text-foreground/60">Access your Foundation Dashboard</p>
       </div>
 
       {error && (
@@ -72,7 +72,7 @@ export default function LoginPage() {
 
       <p className="text-center text-sm mt-6">
         Don't have an account?{' '}
-        <Link href="/auth/signup" className="text-primary font-medium">
+        <Link href="/signup" className="text-primary font-medium">
           Sign up
         </Link>
       </p>
