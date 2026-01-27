@@ -17,24 +17,25 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const user = useSelector(selectCurrentUser);
+  console.log("user1", user)
   const router = useRouter();
   const { t, i18n } = useTranslation();
   const { theme, setTheme } = useTheme();
 
-  // Redirect logic
-  useEffect(() => {
-    if (!user) {
-      router.push("/login");
-    } else if (user.status === 'inactive' && user.role !== 'SuperAdmin') {
-      // Allow inactive SuperAdmin for testing purposes if needed, otherwise remove the check
-      // For now, strict check:
-      router.push("/payment-required");
-    }
-  }, [user, router]);
+  // // Redirect logic
+  // useEffect(() => {
+  //   if (!user) {
+  //     router.push("/login");
+  //   } else if (user.status === 'pending' && user.role !== 'SuperAdmin') {
+  //     // Allow inactive SuperAdmin for testing purposes if needed, otherwise remove the check
+  //     // For now, strict check:
+  //     router.push("/payment-required");
+  //   }
+  // }, [user, router]);
 
-  if (!user) {
-    return null; 
-  }
+  // if (!user) {
+  //   return null; 
+  // }
 
   return (
     <SidebarProvider>

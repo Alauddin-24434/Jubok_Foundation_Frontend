@@ -12,11 +12,15 @@ import {
 import { Menu, X, Languages, Sun, Moon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "next-themes";
+import { useDispatch, useSelector } from "react-redux";
+import { logout, selectCurrentUser } from "@/redux/features/auth/authSlice";
 
 export default function Navbar() {
+  const user = useSelector(selectCurrentUser);
+  console.log("user", user);
   const { t, i18n } = useTranslation();
   const { theme, setTheme } = useTheme();
-
+  const dispatch = useDispatch();
   const [mounted, setMounted] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -24,7 +28,15 @@ export default function Navbar() {
     setMounted(true);
   }, []);
 
+
+  const handleLogout = () => {
+     dispatch(logout())
+  }
+
   if (!mounted) return null;
+
+
+
 
   return (
     <nav className="fixed top-0 w-full z-50 backdrop-blur-xl bg-background/80 border-b border-border">
@@ -91,17 +103,16 @@ export default function Navbar() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Link href="/login">
-            <Button variant="outline">
-              {t("common.login")}
-            </Button>
-          </Link>
-
-          <Link href="/signup">
-            <Button>
-              {t("common.register")}
-            </Button>
-          </Link>
+          {user ? (
+           <><Link href="/dashboard" >
+              <Button variant="outline" className="cursor-pointer">{t("common.dashboard")}</Button>
+              <Button variant="outline"  onClick={handleLogout} className="cursor-pointer bg-primary hover:bg-primary/90 text-primary-foreground ">{t("common.logout")}</Button>
+            </Link></> 
+          ) : (
+            <Link href="/login" >
+              <Button variant="outline" className="cursor-pointer">{t("common.login")}</Button>
+            </Link>
+          )}
         </div>
 
         {/* ================= MOBILE TOGGLE ================= */}
@@ -137,7 +148,9 @@ export default function Navbar() {
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             >
               {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
-              {theme === "dark" ? t("common.themeLight") : t("common.themeDark")}
+              {theme === "dark"
+                ? t("common.themeLight")
+                : t("common.themeDark")}
             </Button>
 
             <button
@@ -159,9 +172,7 @@ export default function Navbar() {
               </Button>
             </Link>
             <Link href="/signup" className="flex-1">
-              <Button className="w-full">
-                {t("common.register")}
-              </Button>
+              <Button className="w-full">{t("common.register")}</Button>
             </Link>
           </div>
         </div>

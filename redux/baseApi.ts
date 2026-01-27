@@ -54,25 +54,44 @@ const baseQueryWithReauth: typeof baseQuery = async (
   api,
   extraOptions
 ) => {
+  console.log("➡️ API Request Started:", args);
+
+  // wait if another refresh is running
   await mutex.waitForUnlock();
 
   let result = await baseQuery(args, api, extraOptions);
 
+  if (result.error) {
+    console.error("❌ API Error:", {
+      url: args,
+      status: result.error.status,
+      error: result.error,
+    });
+  }
+
   if (result.error?.status === 401) {
+    console.warn("🔐 401 Unauthorized detected");
+
     if (!mutex.isLocked()) {
+      console.log("🔓 Mutex free → acquiring lock");
       const release = await mutex.acquire();
 
       try {
+        console.log("🔄 Calling refresh-token API");
+
         const refreshResult = await baseQuery(
           { url: "/auth/refresh-token", method: "POST" },
           api,
           extraOptions
         );
 
+        console.log("📦 Refresh response:", refreshResult);
+
         const refreshData = refreshResult.data as IRefreshResponse;
 
         if (refreshData?.data?.accessToken) {
-          // ✅ SAVE NEW TOKEN
+          console.log("✅ New access token received");
+
           api.dispatch(
             setUser({
               user: refreshData.data.user,
@@ -80,22 +99,30 @@ const baseQueryWithReauth: typeof baseQuery = async (
             })
           );
 
-          // ✅ RETRY ORIGINAL REQUEST WITH NEW TOKEN
+          console.log("🔁 Retrying original request");
           result = await baseQuery(args, api, extraOptions);
         } else {
+          console.error("🚫 Refresh failed → logging out");
           api.dispatch(logout());
         }
+      } catch (err) {
+        console.error("💥 Refresh token error:", err);
+        api.dispatch(logout());
       } finally {
+        console.log("🔓 Releasing mutex lock");
         release();
       }
     } else {
+      console.log("⏳ Waiting for ongoing refresh to finish");
       await mutex.waitForUnlock();
       result = await baseQuery(args, api, extraOptions);
     }
   }
 
+  console.log("✅ API Request Finished:", args);
   return result;
 };
+
 
 /**
  * ============================
@@ -105,7 +132,7 @@ const baseQueryWithReauth: typeof baseQuery = async (
 const baseApi = createApi({
   reducerPath: "baseApi",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["User", "Auth", "Project", "Banner", "Payment"],
+  tagTypes: ["User", "Auth", "Project", "Banner", "Payments"],
   endpoints: () => ({}),
 });
 

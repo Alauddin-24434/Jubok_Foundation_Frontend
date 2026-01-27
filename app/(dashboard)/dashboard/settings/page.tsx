@@ -1,200 +1,180 @@
-'use client'
+"use client"
 
-import React, { useEffect, useMemo, useState } from 'react'
-import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Progress } from '@/components/ui/progress'
-import { useGetMeQuery } from '@/redux/features/auth/authApi'
-import { IUser } from '@/redux/features/auth/authSlice'
+import { useState, useEffect } from "react"
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
+import { useGetMeQuery } from "@/redux/features/auth/authApi"
+import { useUpdateUserMeMutation, } from "@/redux/features/user/userApi"
+import { Facebook, Instagram, Linkedin, X } from "lucide-react"
 
-/* =========================
-   REQUIRED PROFILE FIELDS
-========================= */
-const REQUIRED_FIELDS: (keyof IUser)[] = [
-  'name',
-  'email',
-  'phone',
-  'address',
-  'avatar',
-]
+export default function ProfilePage() {
+  const { data: user, isLoading } = useGetMeQuery(undefined)
+  const [updateUserMe, { isLoading: updating }] = useUpdateUserMeMutation()
 
-/* =========================
-   PROFILE COMPLETION LOGIC
-========================= */
-function calculateProfileCompletion(user: IUser | undefined) {
-  if (!user) {
-    return { percentage: 0, filled: 0, total: REQUIRED_FIELDS.length }
-  }
+  const [isEditing, setIsEditing] = useState(false)
 
-  let filled = 0
-
-  REQUIRED_FIELDS.forEach((field) => {
-    const value = user[field]
-    if (value !== null && value !== undefined && value !== '') {
-      filled++
-    }
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    address: "",
+    cityState: "",
   })
 
-  const percentage = Math.round((filled / REQUIRED_FIELDS.length) * 100)
-
-  return {
-    percentage,
-    filled,
-    total: REQUIRED_FIELDS.length,
-  }
-}
-
-export default function SettingsPage() {
-  const { data, isLoading } = useGetMeQuery(undefined)
-
-  const user: IUser | undefined = data
-
-  const [profile, setProfile] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    address: '',
-    avatar: '',
-  })
-
-  /* =========================
-     SET INITIAL DATA
-  ========================= */
   useEffect(() => {
     if (user) {
-      setProfile({
-        name: user.name ?? '',
-        email: user.email ?? '',
-        phone: user.phone ?? '',
-        address: user.address ?? '',
-        avatar: user.avatar ?? '',
+      setFormData({
+        name: user.name || "",
+        phone: user.phone || "",
+        address: user.address || "",
+        cityState: user.cityState || "",
       })
     }
   }, [user])
 
-  const completion = useMemo(
-    () => calculateProfileCompletion({ ...user, ...profile } as IUser),
-    [user, profile],
-  )
+  if (isLoading) return <p className="p-6">Loading profile...</p>
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setProfile((prev) => ({ ...prev, [name]: value }))
+    setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
-  const handleSave = () => {
-    // 🔥 এখানে API call দিবা (update profile)
-    console.log('UPDATED PROFILE:', profile)
-  }
+  const handleUpdate = async () => {
+    try {
+      await updateUserMe(
+       
+    formData
+    ).unwrap()
 
-  if (isLoading) {
-    return <p className="text-center mt-10">Loading...</p>
+      setIsEditing(false)
+      alert("Profile updated successfully ✅")
+    } catch (err) {
+      console.error(err)
+      alert("Update failed ❌")
+    }
   }
 
   return (
-    <div className="space-y-8 max-w-3xl">
-      {/* ================= HEADER ================= */}
-      <div>
-        <h1 className="text-3xl font-bold">Profile Settings</h1>
-        <p className="text-muted-foreground mt-1">
-          Manage your personal information
-        </p>
+    <div className="py-8 px-4">
+      <div className="container mx-auto">
+
+        <h1 className="text-3xl font-bold mb-8">Profile</h1>
+
+        {/* Profile Card */}
+        <Card className="mb-8">
+          <div className="p-6 flex justify-between gap-6">
+            <div className="flex gap-4">
+              <img
+                src={user?.avatar || "/avatar.png"}
+                className="w-24 h-24 rounded-full border"
+                alt="avatar"
+              />
+
+              <div>
+                <h2 className="text-2xl font-bold">{user?.name}</h2>
+                <p className="text-gray-600">{user?.email}</p>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3 items-end">
+           
+
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setIsEditing(!isEditing)}
+              >
+                ✏️ {isEditing ? "Cancel" : "Edit"}
+              </Button>
+            </div>
+          </div>
+        </Card>
+
+        {/* Personal Info */}
+        <Card className="mb-8">
+          <div className="p-6">
+            <h3 className="text-xl font-bold mb-6">Personal Information</h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+              {/* Name */}
+              <div>
+                <label className="text-sm text-blue-600">Name</label>
+                {isEditing ? (
+                  <input
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    className="w-full border p-2 rounded"
+                  />
+                ) : (
+                  <p className="font-medium">{user?.name}</p>
+                )}
+              </div>
+
+              {/* Email */}
+              <div>
+                <label className="text-sm text-blue-600">Email</label>
+                <p className="font-medium">{user?.email}</p>
+              </div>
+
+              {/* Phone */}
+              <div>
+                <label className="text-sm text-blue-600">Phone</label>
+                {isEditing ? (
+                  <input
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    className="w-full border p-2 rounded"
+                  />
+                ) : (
+                  <p className="font-medium">{user?.phone || "N/A"}</p>
+                )}
+              </div>
+
+              {/* Address */}
+              <div>
+                <label className="text-sm text-blue-600">Address</label>
+                {isEditing ? (
+                  <input
+                    name="address"
+                    value={formData.address}
+                    onChange={handleChange}
+                    className="w-full border p-2 rounded"
+                  />
+                ) : (
+                  <p className="font-medium">{user?.address || "N/A"}</p>
+                )}
+              </div>
+
+              {/* City/State */}
+              <div>
+                <label className="text-sm text-blue-600">City / State</label>
+                {isEditing ? (
+                  <input
+                    name="cityState"
+                    value={formData.cityState}
+                    onChange={handleChange}
+                    className="w-full border p-2 rounded"
+                  />
+                ) : (
+                  <p className="font-medium">{user?.cityState || "N/A"}</p>
+                )}
+              </div>
+
+            </div>
+
+            {isEditing && (
+              <Button
+                className="mt-6"
+                onClick={handleUpdate}
+                disabled={updating}
+              >
+                {updating ? "Saving..." : "Save Changes"}
+              </Button>
+            )}
+          </div>
+        </Card>
       </div>
-
-      {/* ================= PROFILE COMPLETION ================= */}
-      <Card className="p-6 space-y-4">
-        <div className="flex justify-between items-center">
-          <h3 className="font-semibold">Profile Completion</h3>
-          <span className="text-sm font-medium">
-            {completion.percentage}%
-          </span>
-        </div>
-
-        <Progress value={completion.percentage} />
-
-        <p className="text-xs text-muted-foreground">
-          {completion.filled} of {completion.total} required fields completed
-        </p>
-      </Card>
-
-      {/* ================= PROFILE FORM ================= */}
-      <Card className="p-6 space-y-6">
-        <h3 className="text-lg font-semibold">Personal Information</h3>
-
-        <div className="space-y-4">
-          <div>
-            <Label>Name</Label>
-            <Input
-              name="name"
-              value={profile.name}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div>
-            <Label>Email</Label>
-            <Input
-              name="email"
-              type="email"
-              value={profile.email}
-              disabled
-            />
-          </div>
-
-          <div>
-            <Label>Phone</Label>
-            <Input
-              name="phone"
-              value={profile.phone}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div>
-            <Label>Address</Label>
-            <Input
-              name="address"
-              value={profile.address}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div>
-            <Label>Avatar URL</Label>
-            <Input
-              name="avatar"
-              value={profile.avatar}
-              onChange={handleChange}
-            />
-          </div>
-
-          <Button onClick={handleSave} className="w-full">
-            Save Changes
-          </Button>
-        </div>
-      </Card>
-
-      {/* ================= READ ONLY INFO ================= */}
-      <Card className="p-6 space-y-3">
-        <h3 className="text-lg font-semibold">Account Info</h3>
-
-        <div className="text-sm space-y-1">
-          <p>
-            <strong>Role:</strong> {user?.role}
-          </p>
-          <p>
-            <strong>Status:</strong> {user?.status}
-          </p>
-          <p>
-            <strong>Last Login:</strong>{' '}
-            {user?.lastLogin
-              ? new Date(user.lastLogin).toLocaleString()
-              : 'Never'}
-          </p>
-        </div>
-      </Card>
     </div>
   )
 }

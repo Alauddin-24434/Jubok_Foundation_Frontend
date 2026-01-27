@@ -17,6 +17,12 @@ import {
   BarChart3,
   ShieldCheck,
   Settings,
+  Wallet,
+  FolderKanban,
+  CreditCard,
+  Image,
+  Bell,
+  Trash2,
 } from "lucide-react";
 import {
   Sidebar,
@@ -47,6 +53,7 @@ interface SidebarItem {
   roles: UserRole[];
 }
 
+
 export const sidebarItems: SidebarItem[] = [
   {
     title: "Dashboard",
@@ -60,57 +67,59 @@ export const sidebarItems: SidebarItem[] = [
     ],
   },
 
-  // ===== Projects =====
+  // ===== Funds =====
   {
-    title: "Projects",
-    url: "/dashboard/projects",
-    icon: FolderOpen,
-    roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MODERATOR],
-  },
-
-   // ===== Banners =====
-  {
-    title: "Banners",
-    url: "/dashboard/banners",
-    icon: FolderOpen,
-    roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MODERATOR],
-  },
-
-     // ===== Members =====
-  {
-    title: "Members",
-    url: "/dashboard/members",
-    icon: FolderOpen,
-    roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MODERATOR],
-  },
-
-
-  // ===== Payments =====
-  {
-    title: "payments",
-    url: "/dashboard/payments",
-    icon: Boxes,
-    roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MODERATOR],
-  },
-
- 
- 
-
-
-
-  // ===== Membership Approvals (Admin) =====
-  {
-    title: "Pending Approvals",
-    url: "/dashboard/pending-members",
-    icon: ShieldCheck,
+    title: "Funds",
+    url: "/dashboard/funds",
+    icon: Wallet,
     roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MODERATOR],
   },
 
   // ===== User Management =====
   {
-    title: "User Management",
+    title: "Members",
     url: "/dashboard/users",
     icon: Users,
+    roles: [UserRole.SUPER_ADMIN],
+  },
+
+  // ===== Projects =====
+  {
+    title: "Projects",
+    url: "/dashboard/projects",
+    icon: FolderKanban,
+    roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MODERATOR],
+  },
+
+  // ===== Payments =====
+  {
+    title: "Payments",
+    url: "/dashboard/payments",
+    icon: CreditCard,
+    roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MODERATOR],
+  },
+
+  // ===== Banners =====
+  {
+    title: "Banners",
+    url: "/dashboard/banners",
+    icon: Image,
+    roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MODERATOR],
+  },
+
+   // ===== Notice =====
+  {
+    title: "Notice",
+    url: "/dashboard/notices",
+    icon: Bell,
+    roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
+  },
+
+  // ===== Trash =====
+  {
+    title: "Trash",
+    url: "/dashboard/trash",
+    icon: Trash2,
     roles: [UserRole.SUPER_ADMIN],
   },
 

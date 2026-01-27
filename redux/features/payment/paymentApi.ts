@@ -1,51 +1,37 @@
-import baseApi from "../../baseApi";
+import baseApi from "@/redux/baseApi";
 
-const paymentApi = baseApi.injectEndpoints({
+export const paymentApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    verifyPayment: builder.mutation({
-      query: (data) => ({
-        url: "/payments/verify",
-        method: "POST",
-        body: data,
-      }),
-      invalidatesTags: ["Payment"],
-    }),
     initiatePayment: builder.mutation({
       query: (data) => ({
         url: "/payments/initiate",
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["Payment"],
+      invalidatesTags: ["Payments"],
     }),
+
+    // redux/features/payment/paymentApi.ts
+    getPayments: builder.query({
+      query: (params) => ({
+        url: "/payments",
+        params,
+      }),
+      providesTags: ["Payments"],
+    }),
+
     approvePayment: builder.mutation({
-      query: (id) => ({
-        url: `/payments/${id}/approve`,
+      query: (paymentId: string) => ({
+        url: `/payments/${paymentId}/approve`,
         method: "PATCH",
       }),
-      invalidatesTags: ["Payment", "User"], // Activates user too
-    }),
-    getMyPayments: builder.query({
-      query: () => ({
-        url: "/payments/my-payments",
-        method: "GET",
-      }),
-      providesTags: ["Payment"],
-    }),
-    getPendingMembershipPayments: builder.query({
-      query: () => ({
-        url: "/payments/admin/pending-membership",
-        method: "GET",
-      }),
-      providesTags: ["Payment"],
+      invalidatesTags: ["Payments"],
     }),
   }),
 });
 
 export const {
-  useVerifyPaymentMutation,
   useInitiatePaymentMutation,
+  useGetPaymentsQuery,
   useApprovePaymentMutation,
-  useGetMyPaymentsQuery,
-  useGetPendingMembershipPaymentsQuery,
 } = paymentApi;

@@ -1,238 +1,224 @@
-'use client'
+'use client';
 
-import { useState, Suspense } from 'react'
-import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Search, Plus, CheckCircle, Clock, XCircle } from 'lucide-react'
-import { useSearchParams } from 'next/navigation'
-import Loading from './loading'
+import { useState } from 'react';
+import {
+  useGetPaymentsQuery,
+  useApprovePaymentMutation,
+} from '@/redux/features/payment/paymentApi';
 
-interface Payment {
-  id: string
-  projectName: string
-  amount: number
-  method: string
-  status: 'pending' | 'paid' | 'failed'
-  date: string
-  transactionId?: string
-}
+import {
+  Table,
+  TableHead,
+  TableRow,
+  TableHeader,
+  TableBody,
+  TableCell,
+} from '@/components/ui/table';
 
-export default function PaymentsPage() {
-  const [searchQuery, setSearchQuery] = useState('')
-  const searchParams = useSearchParams()
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
 
-  const payments: Payment[] = [
-    {
-      id: '1',
-      projectName: 'Fish Farming Project',
-      amount: 15000,
-      method: 'bKash',
-      status: 'paid',
-      date: '2024-01-20',
-      transactionId: 'TXN001',
-    },
-    {
-      id: '2',
-      projectName: 'Real Estate Venture',
-      amount: 25000,
-      method: 'Bank Transfer',
-      status: 'paid',
-      date: '2024-01-18',
-      transactionId: 'TXN002',
-    },
-    {
-      id: '3',
-      projectName: 'Dairy Farm Initiative',
-      amount: 10000,
-      method: 'Nagad',
-      status: 'pending',
-      date: '2024-01-25',
-    },
-    {
-      id: '4',
-      projectName: 'Agricultural Development',
-      amount: 5000,
-      method: 'Card',
-      status: 'failed',
-      date: '2024-01-22',
-    },
-  ]
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from '@/components/ui/alert-dialog';
 
-  const filteredPayments = payments.filter((payment) =>
-    payment.projectName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    payment.transactionId?.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+import { VerifyPaymentModal } from '@/components/verifyPaymentModel';
 
-  const totalInvested = payments
-    .filter(p => p.status === 'paid')
-    .reduce((sum, p) => sum + p.amount, 0)
+const STATUS_TABS = [
+  'ALL',
+  'PENDING',
+  'PAID',
+  'REJECTED',
+  'FAILED',
+  'CANCELED',
+];
 
-  const pendingAmount = payments
-    .filter(p => p.status === 'pending')
-    .reduce((sum, p) => sum + p.amount, 0)
+export default function AdminPaymentsPage() {
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState('');
+  const [status, setStatus] = useState('PENDING');
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'paid':
-        return <CheckCircle className="h-5 w-5 text-primary" />
-      case 'pending':
-        return <Clock className="h-5 w-5 text-secondary" />
-      case 'failed':
-        return <XCircle className="h-5 w-5 text-destructive" />
-      default:
-        return null
+  const [selectedPayment, setSelectedPayment] = useState<any>(null);
+  const [openVerify, setOpenVerify] = useState(false);
+  const [openConfirm, setOpenConfirm] = useState(false);
+
+  const { data, isLoading } = useGetPaymentsQuery({
+    page,
+    limit: 10,
+    status: status === 'ALL' ? undefined : status,
+    search,
+    sortBy: 'createdAt',
+    sortOrder: 'desc',
+  });
+
+  const [approvePayment, { isLoading: approving }] =
+    useApprovePaymentMutation();
+
+  const handleApprove = async () => {
+    try {
+      await approvePayment(selectedPayment._id).unwrap();
+      toast.success('Payment approved successfully ✅');
+      setOpenConfirm(false);
+      setOpenVerify(false);
+    } catch (err: any) {
+      toast.error(err?.data?.message || 'Approval failed ❌');
     }
-  }
+  };
 
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case 'paid':
-        return 'bg-primary/10 text-primary'
-      case 'pending':
-        return 'bg-secondary/10 text-secondary'
-      case 'failed':
-        return 'bg-destructive/10 text-destructive'
-      default:
-        return ''
-    }
-  }
-
-  const StatCard = ({ label, value, color }: any) => (
-    <Card className="p-6">
-      <p className="text-foreground/60 text-sm font-medium">{label}</p>
-      <p className={`text-2xl font-bold mt-2 ${color}`}>{value}</p>
-    </Card>
-  )
+  if (isLoading) return <p className="p-6">Loading payments...</p>;
 
   return (
-    <Suspense fallback={<Loading />}>
-      <div className="space-y-8">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Payments</h1>
-            <p className="text-foreground/60 mt-1">View and manage your investments</p>
-          </div>
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            New Investment
+    <div className="p-6 space-y-4">
+
+      {/* 🔘 STATUS TOGGLE */}
+      <div className="flex flex-wrap gap-2">
+        {STATUS_TABS.map((item) => (
+          <Button
+            key={item}
+            size="sm"
+            variant={status === item ? 'default' : 'outline'}
+            onClick={() => {
+              setStatus(item);
+              setPage(1);
+            }}
+          >
+            {item}
           </Button>
-        </div>
-
-        {/* Stats */}
-        <div className="grid md:grid-cols-3 gap-6">
-          <StatCard
-            label="Total Invested"
-            value={`৳${(totalInvested / 1000).toFixed(0)}k`}
-            color="text-primary"
-          />
-          <StatCard
-            label="Pending Payments"
-            value={`৳${(pendingAmount / 1000).toFixed(0)}k`}
-            color="text-secondary"
-          />
-          <StatCard
-            label="Total Transactions"
-            value={payments.length}
-            color="text-foreground"
-          />
-        </div>
-
-        {/* Tabs */}
-        <Tabs defaultValue="all" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="paid">Paid</TabsTrigger>
-            <TabsTrigger value="pending">Pending</TabsTrigger>
-            <TabsTrigger value="failed">Failed</TabsTrigger>
-          </TabsList>
-
-          {['all', 'paid', 'pending', 'failed'].map((tab) => (
-            <TabsContent key={tab} value={tab} className="space-y-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-foreground/40" />
-                <Input
-                  placeholder="Search by project or transaction ID..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-border">
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-foreground/70">Project</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-foreground/70">Amount</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-foreground/70">Method</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-foreground/70">Status</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-foreground/70">Date</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-foreground/70">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredPayments
-                      .filter(p => tab === 'all' || p.status === tab)
-                      .map((payment) => (
-                        <tr key={payment.id} className="border-b border-border hover:bg-muted/50 transition">
-                          <td className="px-4 py-4">
-                            <div>
-                              <p className="font-medium text-foreground">{payment.projectName}</p>
-                              {payment.transactionId && (
-                                <p className="text-xs text-foreground/60 mt-1">ID: {payment.transactionId}</p>
-                              )}
-                            </div>
-                          </td>
-                          <td className="px-4 py-4 font-semibold text-foreground">
-                            ৳{payment.amount.toLocaleString()}
-                          </td>
-                          <td className="px-4 py-4 text-sm text-foreground/70">{payment.method}</td>
-                          <td className="px-4 py-4">
-                            <div className="flex items-center gap-2">
-                              {getStatusIcon(payment.status)}
-                              <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusLabel(payment.status)}`}>
-                                {payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="px-4 py-4 text-sm text-foreground/70">
-                            {new Date(payment.date).toLocaleDateString()}
-                          </td>
-                          <td className="px-4 py-4">
-                            {payment.status === 'pending' && (
-                              <Button variant="outline" size="sm">
-                                Complete
-                              </Button>
-                            )}
-                            {payment.status === 'failed' && (
-                              <Button variant="outline" size="sm">
-                                Retry
-                              </Button>
-                            )}
-                            {payment.status === 'paid' && (
-                              <Button variant="ghost" size="sm">
-                                Receipt
-                              </Button>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {filteredPayments.filter(p => tab === 'all' || p.status === tab).length === 0 && (
-                <Card className="p-12 text-center">
-                  <p className="text-foreground/60">No {tab !== 'all' ? tab : ''} payments found</p>
-                </Card>
-              )}
-            </TabsContent>
-          ))}
-        </Tabs>
+        ))}
       </div>
-    </Suspense>
-  )
+
+      {/* 🔍 SEARCH */}
+      <Input
+        placeholder="Search name / email / phone"
+        value={search}
+        onChange={(e) => {
+          setSearch(e.target.value);
+          setPage(1);
+        }}
+      />
+
+      {/* 📊 TABLE */}
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Name</TableHead>
+            <TableHead>Email</TableHead>
+            <TableHead>Phone</TableHead>
+            <TableHead>Amount</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Action</TableHead>
+            <TableHead>Date</TableHead>
+          </TableRow>
+        </TableHeader>
+
+        <TableBody>
+          {data?.data?.map((payment: any) => (
+            <TableRow key={payment._id}>
+              <TableCell>{payment.userId?.name}</TableCell>
+              <TableCell>{payment.userId?.email}</TableCell>
+              <TableCell>{payment.senderNumber}</TableCell>
+              <TableCell>৳ {payment.amount}</TableCell>
+
+              <TableCell>
+                <Badge
+                  variant={
+                    payment.status === 'PAID'
+                      ? 'default'
+                      : payment.status === 'PENDING'
+                      ? 'outline'
+                      : 'destructive'
+                  }
+                >
+                  {payment.status}
+                </Badge>
+              </TableCell>
+
+              <TableCell>
+                {payment.status === 'PENDING' ? (
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      setSelectedPayment(payment);
+                      setOpenVerify(true);
+                    }}
+                  >
+                    Verify
+                  </Button>
+                ) : (
+                  <span className="text-muted-foreground">—</span>
+                )}
+              </TableCell>
+
+              <TableCell>
+                {new Date(payment.createdAt).toLocaleDateString()}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+
+      {/* 📄 PAGINATION */}
+      <div className="flex justify-between items-center">
+        <Button
+          disabled={page === 1}
+          onClick={() => setPage((p) => p - 1)}
+        >
+          Previous
+        </Button>
+
+        <p>
+          Page {data.meta.page} of {data.meta.totalPages}
+        </p>
+
+        <Button
+          disabled={page === data.meta.totalPages}
+          onClick={() => setPage((p) => p + 1)}
+        >
+          Next
+        </Button>
+      </div>
+
+      {/* 🔍 VERIFY MODAL */}
+      <VerifyPaymentModal
+        open={openVerify}
+        onClose={() => setOpenVerify(false)}
+        payment={selectedPayment}
+        onConfirm={() => setOpenConfirm(true)}
+        loading={approving}
+      />
+
+      {/* 🔐 CONFIRM DIALOG */}
+      <AlertDialog open={openConfirm} onOpenChange={setOpenConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Confirm Payment Approval
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to approve this payment?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleApprove}
+              disabled={approving}
+            >
+              {approving ? 'Approving...' : 'Yes, Approve'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
 }
