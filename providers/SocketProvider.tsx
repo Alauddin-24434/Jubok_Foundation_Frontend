@@ -33,11 +33,14 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     // Replace with your backend URL (usually environment variable)
-    const socketInstance = io(process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000", {
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000,
-      transports: ["websocket"], // Force websocket for better performance
-    });
+    const socketInstance = io(
+      process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000",
+      {
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000,
+        transports: ["websocket"], // Force websocket for better performance
+      },
+    );
 
     //======================   EVENT LISTENERS   ===============================
     socketInstance.on("connect", () => {

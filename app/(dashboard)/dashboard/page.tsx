@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 //==================================================================================
 //                               DASHBOARD OVERVIEW
@@ -7,21 +7,26 @@
 // Features: Statistical overview, pending account handling, and project summaries.
 //==================================================================================
 
-import Link from 'next/link'
-import { AlertTriangle, LayoutDashboard, Database, CreditCard } from 'lucide-react'
+import Link from "next/link";
+import {
+  AlertTriangle,
+  LayoutDashboard,
+  Database,
+  CreditCard,
+} from "lucide-react";
 
-import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
-import { useGetMeQuery, useGetStatsQuery } from '@/redux/features/auth/authApi'
-import { useGetProjectsQuery } from '@/redux/features/project/projectApi'
-import { AFPageHeader } from '@/components/shared/AFPageHeader'
+import { useGetMeQuery, useGetStatsQuery } from "@/redux/features/auth/authApi";
+import { useGetProjectsQuery } from "@/redux/features/project/projectApi";
+import { AFPageHeader } from "@/components/shared/AFPageHeader";
 
 export default function DashboardPage() {
   //======================   API HOOKS & DATA   ===============================
-  const { data: user, isLoading: userLoading } = useGetMeQuery({})
-  const { data: stats } = useGetStatsQuery({})
-  const { data: projectsData } = useGetProjectsQuery({ limit: 5 })
+  const { data: user, isLoading: userLoading } = useGetMeQuery({});
+  const { data: stats } = useGetStatsQuery({});
+  const { data: projectsData } = useGetProjectsQuery({ limit: 5 });
 
   //======================   RENDER LOGIC   ===============================
   if (userLoading) {
@@ -29,13 +34,15 @@ export default function DashboardPage() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="animate-pulse flex flex-col items-center gap-4">
           <div className="h-12 w-12 bg-primary/20 rounded-full"></div>
-          <p className="text-muted-foreground font-medium italic">Loading dashboard...</p>
+          <p className="text-muted-foreground font-medium italic">
+            Loading dashboard...
+          </p>
         </div>
       </div>
-    )
+    );
   }
 
-  const isPending = user?.status === 'PENDING'
+  const isPending = user?.status === "PENDING";
 
   //======================   PENDING ACCOUNT VIEW   ===============================
   if (isPending) {
@@ -52,28 +59,32 @@ export default function DashboardPage() {
                 Account Approval Pending
               </h2>
               <p className="text-muted-foreground leading-relaxed max-w-sm mx-auto">
-                Your account is currently under review. To activate full access, please complete your registration payment.
+                Your account is currently under review. To activate full access,
+                please complete your registration payment.
               </p>
             </div>
 
             <Link href="/payment" className="w-full sm:w-auto">
-              <Button variant="destructive" size="lg" className="w-full sm:px-12 rounded-full font-bold shadow-lg shadow-destructive/20 hover:scale-105 transition-transform">
+              <Button
+                variant="destructive"
+                size="lg"
+                className="w-full sm:px-12 rounded-full font-bold shadow-lg shadow-destructive/20 hover:scale-105 transition-transform"
+              >
                 Complete Payment Now
               </Button>
             </Link>
           </div>
         </Card>
       </div>
-    )
+    );
   }
 
   //======================   STANDARD DASHBOARD VIEW   ===============================
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      
       {/* Page Header */}
-      <AFPageHeader 
-        title={`Welcome back, ${user?.name || 'User'}!`}
+      <AFPageHeader
+        title={`Welcome back, ${user?.name || "User"}!`}
         description="Here's a quick look at your foundation's current status and activities."
       />
 
@@ -85,19 +96,23 @@ export default function DashboardPage() {
               <LayoutDashboard size={24} />
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground uppercase">Total Projects</p>
+              <p className="text-sm font-medium text-muted-foreground uppercase">
+                Total Projects
+              </p>
               <h3 className="text-2xl font-bold">12</h3>
             </div>
           </div>
         </Card>
-        
+
         <Card className="p-6 border-l-4 border-l-emerald-500 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-emerald-500/10 rounded-xl text-emerald-500">
               <Database size={24} />
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground uppercase">Total Funds</p>
+              <p className="text-sm font-medium text-muted-foreground uppercase">
+                Total Funds
+              </p>
               <h3 className="text-2xl font-bold">৳ 450,000</h3>
             </div>
           </div>
@@ -109,7 +124,9 @@ export default function DashboardPage() {
               <CreditCard size={24} />
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground uppercase">New Requests</p>
+              <p className="text-sm font-medium text-muted-foreground uppercase">
+                New Requests
+              </p>
               <h3 className="text-2xl font-bold">5</h3>
             </div>
           </div>
@@ -122,13 +139,15 @@ export default function DashboardPage() {
           <div className="bg-primary/5 p-4 rounded-full mb-4">
             <LayoutDashboard className="h-8 w-8 text-primary/40" />
           </div>
-          <h3 className="text-lg font-bold">Project Visualizations Coming Soon</h3>
+          <h3 className="text-lg font-bold">
+            Project Visualizations Coming Soon
+          </h3>
           <p className="text-muted-foreground max-w-md mt-2">
-            We are currently integrating data visualizations for your projects. Stay tuned for real-time analytics and tracking.
+            We are currently integrating data visualizations for your projects.
+            Stay tuned for real-time analytics and tracking.
           </p>
         </Card>
       </div>
     </div>
-  )
+  );
 }
-

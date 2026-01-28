@@ -6,8 +6,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  turbopack:false
-  
-}
+  turbopack: false,
+};
 
-export default nextConfig
+export default nextConfig;

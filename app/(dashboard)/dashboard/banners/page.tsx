@@ -9,7 +9,14 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash2, Edit2, Loader2, Image as ImageIcon, LayoutList } from "lucide-react";
+import {
+  Plus,
+  Trash2,
+  Edit2,
+  Loader2,
+  Image as ImageIcon,
+  LayoutList,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   useGetBannersQuery,
@@ -94,7 +101,12 @@ export default function BannersPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to permanently strip this banner from the site?")) return;
+    if (
+      !confirm(
+        "Are you sure you want to permanently strip this banner from the site?",
+      )
+    )
+      return;
 
     try {
       await deleteBanner(id).unwrap();
@@ -118,31 +130,34 @@ export default function BannersPage() {
         </div>
       ),
     },
-    { 
-      header: "Headline", 
+    {
+      header: "Headline",
       cell: (banner: any) => (
         <div className="max-w-[200px]">
           <p className="font-bold text-sm truncate">{banner.title}</p>
-          <p className="text-[10px] text-muted-foreground truncate">{banner.description || "No subtitle"}</p>
+          <p className="text-[10px] text-muted-foreground truncate">
+            {banner.description || "No subtitle"}
+          </p>
         </div>
-      )
+      ),
     },
-    { 
-      header: "Sequence", 
+    {
+      header: "Sequence",
       cell: (banner: any) => (
         <div className="flex items-center gap-1.5 font-black text-xs text-primary bg-primary/5 w-fit px-2 py-1 rounded">
           <LayoutList size={12} />
           {banner.displayOrder}
         </div>
-      )
+      ),
     },
     {
       header: "Status",
       cell: (banner: any) => (
-        <Badge 
-          className={banner.isActive 
-            ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20 shadow-none uppercase font-black text-[9px]" 
-            : "bg-muted text-muted-foreground border-transparent uppercase font-black text-[9px]"
+        <Badge
+          className={
+            banner.isActive
+              ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20 shadow-none uppercase font-black text-[9px]"
+              : "bg-muted text-muted-foreground border-transparent uppercase font-black text-[9px]"
           }
           variant={banner.isActive ? "default" : "secondary"}
         >
@@ -184,7 +199,10 @@ export default function BannersPage() {
         title="Hero Content Management"
         description="Configure front-facing banners to highlight foundation milestones and announcements."
         action={
-          <Button onClick={() => setIsModalOpen(true)} className="rounded-xl shadow-lg shadow-primary/20 h-11 px-6 font-black scale-100 hover:scale-105 active:scale-95 transition-all">
+          <Button
+            onClick={() => setIsModalOpen(true)}
+            className="rounded-xl shadow-lg shadow-primary/20 h-11 px-6 font-black scale-100 hover:scale-105 active:scale-95 transition-all"
+          >
             <Plus className="h-5 w-5 mr-2" />
             New Banner Asset
           </Button>
@@ -208,18 +226,24 @@ export default function BannersPage() {
           setIsModalOpen(open);
           if (!open) resetForm();
         }}
-        title={editingBanner ? "Modify Existing Banner" : "Create New Banner Asset"}
+        title={
+          editingBanner ? "Modify Existing Banner" : "Create New Banner Asset"
+        }
         className="sm:max-w-[550px] rounded-3xl"
       >
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="bg-primary/5 p-4 rounded-xl flex items-center gap-3">
             <ImageIcon className="text-primary h-5 w-5" />
-            <p className="text-xs font-bold text-primary uppercase tracking-tighter">Asset Configuration</p>
+            <p className="text-xs font-bold text-primary uppercase tracking-tighter">
+              Asset Configuration
+            </p>
           </div>
 
           <div className="grid gap-6">
             <div className="space-y-2">
-              <label className="text-xs font-black uppercase text-muted-foreground ml-1">Asset Headline</label>
+              <label className="text-xs font-black uppercase text-muted-foreground ml-1">
+                Asset Headline
+              </label>
               <Input
                 value={formData.title}
                 onChange={(e) =>
@@ -232,7 +256,9 @@ export default function BannersPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-black uppercase text-muted-foreground ml-1">Contextual Description</label>
+              <label className="text-xs font-black uppercase text-muted-foreground ml-1">
+                Contextual Description
+              </label>
               <textarea
                 className="w-full min-h-[100px] rounded-xl border border-muted-foreground/20 bg-background px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                 value={formData.description}
@@ -256,7 +282,9 @@ export default function BannersPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-xs font-black uppercase text-muted-foreground ml-1">Hierarchy Index</label>
+                <label className="text-xs font-black uppercase text-muted-foreground ml-1">
+                  Hierarchy Index
+                </label>
                 <Input
                   type="number"
                   value={formData.displayOrder}
@@ -271,11 +299,13 @@ export default function BannersPage() {
                 />
               </div>
               <div className="flex flex-col justify-end">
-                <Button 
-                   type="button" 
-                   variant={formData.isActive ? "default" : "outline"}
-                   className={`h-11 rounded-xl font-bold transition-all ${formData.isActive ? 'bg-emerald-500 hover:bg-emerald-600' : ''}`}
-                   onClick={() => setFormData({...formData, isActive: !formData.isActive})}
+                <Button
+                  type="button"
+                  variant={formData.isActive ? "default" : "outline"}
+                  className={`h-11 rounded-xl font-bold transition-all ${formData.isActive ? "bg-emerald-500 hover:bg-emerald-600" : ""}`}
+                  onClick={() =>
+                    setFormData({ ...formData, isActive: !formData.isActive })
+                  }
                 >
                   {formData.isActive ? "Live in Frontend" : "Stay in Draft"}
                 </Button>
@@ -284,10 +314,18 @@ export default function BannersPage() {
           </div>
 
           <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-muted/30">
-            <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)} className="rounded-xl px-8 order-2 sm:order-1 font-bold">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsModalOpen(false)}
+              className="rounded-xl px-8 order-2 sm:order-1 font-bold"
+            >
               Discard Changes
             </Button>
-            <Button type="submit" className="rounded-xl px-10 font-black shadow-lg shadow-primary/20 order-1 sm:order-2">
+            <Button
+              type="submit"
+              className="rounded-xl px-10 font-black shadow-lg shadow-primary/20 order-1 sm:order-2"
+            >
               Commit Asset
             </Button>
           </div>
@@ -296,4 +334,3 @@ export default function BannersPage() {
     </div>
   );
 }
-

@@ -28,15 +28,11 @@ export default function Navbar() {
     setMounted(true);
   }, []);
 
-
   const handleLogout = () => {
-     dispatch(logout())
-  }
+    dispatch(logout());
+  };
 
   if (!mounted) return null;
-
-
-
 
   return (
     <nav className="fixed top-0 w-full z-50 backdrop-blur-xl bg-background/80 border-b border-border">
@@ -104,13 +100,25 @@ export default function Navbar() {
           </DropdownMenu>
 
           {user ? (
-           <><Link href="/dashboard" >
-              <Button variant="outline" className="cursor-pointer">{t("common.dashboard")}</Button>
-              <Button variant="outline"  onClick={handleLogout} className="cursor-pointer bg-primary hover:bg-primary/90 text-primary-foreground ">{t("common.logout")}</Button>
-            </Link></> 
+            <>
+              <Link href="/dashboard">
+                <Button variant="outline" className="cursor-pointer">
+                  {t("common.dashboard")}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={handleLogout}
+                  className="cursor-pointer bg-primary hover:bg-primary/90 text-primary-foreground "
+                >
+                  {t("common.logout")}
+                </Button>
+              </Link>
+            </>
           ) : (
-            <Link href="/login" >
-              <Button variant="outline" className="cursor-pointer">{t("common.login")}</Button>
+            <Link href="/login">
+              <Button variant="outline" className="cursor-pointer">
+                {t("common.login")}
+              </Button>
             </Link>
           )}
         </div>

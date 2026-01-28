@@ -23,7 +23,8 @@ export const metadata: Metadata = {
   title: "Alhamdulillah Foundation | Collaborative Investment Platform",
   description:
     "A secure platform for managing community investment projects including agriculture, fish farming, and real estate development.",
-  keywords: "Alhamdulillah Foundation, Investment, Halal Investment, Agriculture, Fish Farming, Real Estate, Bangladesh",
+  keywords:
+    "Alhamdulillah Foundation, Investment, Halal Investment, Agriculture, Fish Farming, Real Estate, Bangladesh",
   authors: [{ name: "Alhamdulillah Foundation Team" }],
   openGraph: {
     title: "Alhamdulillah Foundation | Collaborative Investment Platform",
@@ -73,9 +74,7 @@ export default function RootLayout({
               enableSystem
               disableTransitionOnChange
             >
-              <SocketProvider>
-                {children}
-              </SocketProvider>
+              <SocketProvider>{children}</SocketProvider>
             </ThemeProvider>
           </I18nProvider>
           <Analytics />

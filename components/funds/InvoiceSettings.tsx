@@ -12,7 +12,13 @@ interface InvoiceProps {
   onGenerate: () => void;
 }
 
-export const InvoiceSettings = ({ sigName, setSigName, sigDesignation, setSigDesignation, onGenerate }: InvoiceProps) => (
+export const InvoiceSettings = ({
+  sigName,
+  setSigName,
+  sigDesignation,
+  setSigDesignation,
+  onGenerate,
+}: InvoiceProps) => (
   <Card className="border-2 border-blue-100 shadow-md">
     <CardHeader className="bg-blue-50/50 py-3">
       <CardTitle className="text-lg text-blue-700 flex items-center gap-2">
@@ -24,29 +30,33 @@ export const InvoiceSettings = ({ sigName, setSigName, sigDesignation, setSigDes
       {/* flex layout ব্যবহার করা হয়েছে যাতে বাটনটি ইনপুটের পাশে ছোট হয়ে থাকে */}
       <div className="flex flex-col md:flex-row items-end gap-4">
         <div className="flex-1 w-full">
-          <label className="text-xs font-medium text-gray-500 mb-1 block">Signatory Name</label>
-          <Input 
-            placeholder="Name" 
-            value={sigName} 
-            onChange={(e) => setSigName(e.target.value)} 
+          <label className="text-xs font-medium text-gray-500 mb-1 block">
+            Signatory Name
+          </label>
+          <Input
+            placeholder="Name"
+            value={sigName}
+            onChange={(e) => setSigName(e.target.value)}
             className="h-9"
           />
         </div>
-        
+
         <div className="flex-1 w-full">
-          <label className="text-xs font-medium text-gray-500 mb-1 block">Designation</label>
-          <Input 
-            placeholder="Designation" 
-            value={sigDesignation} 
-            onChange={(e) => setSigDesignation(e.target.value)} 
+          <label className="text-xs font-medium text-gray-500 mb-1 block">
+            Designation
+          </label>
+          <Input
+            placeholder="Designation"
+            value={sigDesignation}
+            onChange={(e) => setSigDesignation(e.target.value)}
             className="h-9"
           />
         </div>
 
         {/* বাটনটি এখন ছোট (sm) এবং যতটুকু টেক্সট ততটুকু জায়গা (w-fit) নিবে */}
-        <Button 
-          onClick={onGenerate} 
-          disabled={!sigName || !sigDesignation} 
+        <Button
+          onClick={onGenerate}
+          disabled={!sigName || !sigDesignation}
           size="sm"
           className="bg-blue-600 hover:bg-blue-800 text-white font-bold h-9 px-6 w-fit"
         >

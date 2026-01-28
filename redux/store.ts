@@ -2,7 +2,7 @@
 // 🧾 Redux Store Configuration with Persist & RTK Query
 // ====================================================
 
-import { configureStore, combineReducers } from '@reduxjs/toolkit';
+import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import {
   persistStore,
   persistReducer,
@@ -12,10 +12,10 @@ import {
   PERSIST,
   PURGE,
   REGISTER,
-} from 'redux-persist';
-import storage from 'redux-persist/lib/storage'; // localStorage for web
-import baseApi from './baseApi';
-import authReducer from './features/auth/authSlice';
+} from "redux-persist";
+import storage from "redux-persist/lib/storage"; // localStorage for web
+import baseApi from "./baseApi";
+import authReducer from "./features/auth/authSlice";
 // ===== Feature Reducers =====
 
 // ===== Combine Reducers =====
@@ -27,9 +27,9 @@ const rootReducer = combineReducers({
 
 // ===== Persist Config =====
 const persistConfig = {
-  key: 'root',
+  key: "root",
   storage,
-  whitelist: ['AFAuth',  ], // persist only these slices
+  whitelist: ["AFAuth"], // persist only these slices
 };
 
 // ===== Persisted Reducer =====

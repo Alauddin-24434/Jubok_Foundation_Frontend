@@ -83,7 +83,9 @@ export default function UsersPage() {
   };
 
   const handleDelete = async (userId: string) => {
-    if (confirm("Are you sure you want to permanently delete this user profile?")) {
+    if (
+      confirm("Are you sure you want to permanently delete this user profile?")
+    ) {
       try {
         await deleteUser(userId).unwrap();
         toast.success("User removed successfully");
@@ -134,7 +136,10 @@ export default function UsersPage() {
         );
       case UserStatus.SUSPENDED:
         return (
-          <Badge variant="destructive" className="bg-red-500/10 text-red-600 border-red-500/20 hover:bg-red-500/20 uppercase text-[9px] font-black px-2 py-0.5">
+          <Badge
+            variant="destructive"
+            className="bg-red-500/10 text-red-600 border-red-500/20 hover:bg-red-500/20 uppercase text-[9px] font-black px-2 py-0.5"
+          >
             <UserX size={10} className="mr-1" />
             {status}
           </Badge>
@@ -151,7 +156,10 @@ export default function UsersPage() {
         );
       default:
         return (
-          <Badge variant="secondary" className="uppercase text-[9px] font-black px-2 py-0.5">
+          <Badge
+            variant="secondary"
+            className="uppercase text-[9px] font-black px-2 py-0.5"
+          >
             {status}
           </Badge>
         );
@@ -160,8 +168,8 @@ export default function UsersPage() {
 
   //======================   TABLE DEFINITION   ===============================
   const columns = [
-    { 
-      header: "User Identity", 
+    {
+      header: "User Identity",
       cell: (user: any) => (
         <div className="flex flex-col">
           <span className="font-bold text-foreground flex items-center gap-1.5">
@@ -173,7 +181,7 @@ export default function UsersPage() {
             {user.email}
           </span>
         </div>
-      )
+      ),
     },
     {
       header: "System Role",
@@ -186,8 +194,12 @@ export default function UsersPage() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent className="rounded-xl">
-            <SelectItem value={UserRole.ADMIN} className="text-xs font-medium">Admin</SelectItem>
-            <SelectItem value={UserRole.MEMBER} className="text-xs font-medium">Member</SelectItem>
+            <SelectItem value={UserRole.ADMIN} className="text-xs font-medium">
+              Admin
+            </SelectItem>
+            <SelectItem value={UserRole.MEMBER} className="text-xs font-medium">
+              Member
+            </SelectItem>
           </SelectContent>
         </Select>
       ),
@@ -265,9 +277,15 @@ export default function UsersPage() {
             <SelectValue placeholder="System Role" />
           </SelectTrigger>
           <SelectContent className="rounded-xl">
-            <SelectItem value="all" className="font-medium">All User Roles</SelectItem>
-            <SelectItem value={UserRole.ADMIN} className="font-medium">Administrator</SelectItem>
-            <SelectItem value={UserRole.MEMBER} className="font-medium">Foundation Member</SelectItem>
+            <SelectItem value="all" className="font-medium">
+              All User Roles
+            </SelectItem>
+            <SelectItem value={UserRole.ADMIN} className="font-medium">
+              Administrator
+            </SelectItem>
+            <SelectItem value={UserRole.MEMBER} className="font-medium">
+              Foundation Member
+            </SelectItem>
           </SelectContent>
         </Select>
       </AFSearchFilters>
@@ -295,9 +313,15 @@ export default function UsersPage() {
               <Shield className="text-primary h-6 w-6" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground font-bold uppercase tracking-widest">Managing Security for</p>
-              <h4 className="font-black text-lg text-foreground">{editingUser?.name}</h4>
-              <p className="text-xs text-muted-foreground">{editingUser?.email}</p>
+              <p className="text-xs text-muted-foreground font-bold uppercase tracking-widest">
+                Managing Security for
+              </p>
+              <h4 className="font-black text-lg text-foreground">
+                {editingUser?.name}
+              </h4>
+              <p className="text-xs text-muted-foreground">
+                {editingUser?.email}
+              </p>
             </div>
           </div>
 
@@ -306,9 +330,9 @@ export default function UsersPage() {
               <div
                 key={permission}
                 className={`flex items-center space-x-3 p-4 rounded-2xl border transition-all duration-300 ${
-                  selectedPermissions.includes(permission) 
-                  ? "bg-primary/5 border-primary/30 shadow-sm" 
-                  : "bg-background border-muted hover:border-muted-foreground/30"
+                  selectedPermissions.includes(permission)
+                    ? "bg-primary/5 border-primary/30 shadow-sm"
+                    : "bg-background border-muted hover:border-muted-foreground/30"
                 }`}
               >
                 <Checkbox
@@ -328,11 +352,21 @@ export default function UsersPage() {
           </div>
 
           <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-muted/50">
-            <Button variant="outline" onClick={() => setIsModalOpen(false)} className="rounded-xl px-6 font-bold order-2 sm:order-1">
+            <Button
+              variant="outline"
+              onClick={() => setIsModalOpen(false)}
+              className="rounded-xl px-6 font-bold order-2 sm:order-1"
+            >
               Discard Changes
             </Button>
-            <Button onClick={savePermissions} disabled={isUpdating} className="rounded-xl px-8 font-black shadow-lg shadow-primary/20 order-1 sm:order-2">
-              {isUpdating && <Loader2 className="mr-2 h-4 w-4 animate-spin font-bold" />}
+            <Button
+              onClick={savePermissions}
+              disabled={isUpdating}
+              className="rounded-xl px-8 font-black shadow-lg shadow-primary/20 order-1 sm:order-2"
+            >
+              {isUpdating && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin font-bold" />
+              )}
               Commit Permissions
             </Button>
           </div>
@@ -341,4 +375,3 @@ export default function UsersPage() {
     </div>
   );
 }
-

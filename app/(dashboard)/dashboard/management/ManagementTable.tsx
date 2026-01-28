@@ -19,7 +19,11 @@ interface ManagementTableProps {
   onDelete: (id: string) => void;
 }
 
-export function ManagementTable({ managements, onEdit, onDelete }: ManagementTableProps) {
+export function ManagementTable({
+  managements,
+  onEdit,
+  onDelete,
+}: ManagementTableProps) {
   return (
     <div className="rounded-xl border bg-card shadow-sm overflow-hidden">
       <div className="overflow-x-auto">
@@ -37,22 +41,35 @@ export function ManagementTable({ managements, onEdit, onDelete }: ManagementTab
           <TableBody>
             {managements?.length > 0 ? (
               managements.map((management) => (
-                <TableRow key={management._id} className="hover:bg-muted/30 transition-colors">
+                <TableRow
+                  key={management._id}
+                  className="hover:bg-muted/30 transition-colors"
+                >
                   <TableCell>
                     <div className="flex flex-col">
-                      <span className="font-semibold">{management.userId?.name}</span>
-                      <span className="text-xs text-muted-foreground">{management.userId?.email}</span>
+                      <span className="font-semibold">
+                        {management.userId?.name}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        {management.userId?.email}
+                      </span>
                     </div>
                   </TableCell>
                   <TableCell>{management.position}</TableCell>
                   <TableCell>
-                    {management.startAt ? format(new Date(management.startAt), "PPP") : "N/A"}
+                    {management.startAt
+                      ? format(new Date(management.startAt), "PPP")
+                      : "N/A"}
                   </TableCell>
                   <TableCell>
-                    {management.endAt ? format(new Date(management.endAt), "PPP") : "Present"}
+                    {management.endAt
+                      ? format(new Date(management.endAt), "PPP")
+                      : "Present"}
                   </TableCell>
                   <TableCell>
-                    <Badge variant={management.isActive ? "default" : "secondary"}>
+                    <Badge
+                      variant={management.isActive ? "default" : "secondary"}
+                    >
                       {management.isActive ? "Active" : "Inactive"}
                     </Badge>
                   </TableCell>
@@ -80,7 +97,10 @@ export function ManagementTable({ managements, onEdit, onDelete }: ManagementTab
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
+                <TableCell
+                  colSpan={6}
+                  className="h-24 text-center text-muted-foreground"
+                >
                   No management records found.
                 </TableCell>
               </TableRow>

@@ -10,13 +10,22 @@
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { IUser, selectCurrentUser } from "@/redux/features/auth/authSlice";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "next-themes";
 import { Languages, Sun, Moon } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 
 export default function DashboardLayout({
@@ -48,46 +57,61 @@ export default function DashboardLayout({
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
-             {/* Theme Toggle Button */}
-             <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="rounded-full hover:bg-primary/10 h-9 w-9"
-              >
-                {theme === "dark" ? <Sun size={18} className="text-amber-400" /> : <Moon size={18} className="text-slate-700" />}
-              </Button>
+            {/* Theme Toggle Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="rounded-full hover:bg-primary/10 h-9 w-9"
+            >
+              {theme === "dark" ? (
+                <Sun size={18} className="text-amber-400" />
+              ) : (
+                <Moon size={18} className="text-slate-700" />
+              )}
+            </Button>
 
-              {/* Language Switcher Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="rounded-full hover:bg-primary/10 h-9 w-9">
-                    <Languages className="h-4 w-4 text-primary" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-[180px] rounded-2xl shadow-2xl border-primary/10 p-2">
-                  <DropdownMenuItem 
-                    className="cursor-pointer rounded-xl font-bold py-3"
-                    onClick={() => { i18n.changeLanguage("en"); localStorage.setItem("lang", "en"); }}
-                  >
-                    English (US)
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    className="cursor-pointer rounded-xl font-bold py-3"
-                    onClick={() => { i18n.changeLanguage("bn"); localStorage.setItem("lang", "bn"); }}
-                  >
-                    বাংলা (Bengali)
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+            {/* Language Switcher Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full hover:bg-primary/10 h-9 w-9"
+                >
+                  <Languages className="h-4 w-4 text-primary" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="w-[180px] rounded-2xl shadow-2xl border-primary/10 p-2"
+              >
+                <DropdownMenuItem
+                  className="cursor-pointer rounded-xl font-bold py-3"
+                  onClick={() => {
+                    i18n.changeLanguage("en");
+                    localStorage.setItem("lang", "en");
+                  }}
+                >
+                  English (US)
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="cursor-pointer rounded-xl font-bold py-3"
+                  onClick={() => {
+                    i18n.changeLanguage("bn");
+                    localStorage.setItem("lang", "bn");
+                  }}
+                >
+                  বাংলা (Bengali)
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </header>
-        
+
         {/*======================   DASHBOARD CONTENT   ===============================*/}
         <div className="flex-1 p-4 md:p-6 lg:p-10 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 overflow-y-auto">
-          <div className="mx-auto max-w-7xl w-full">
-            {children}
-          </div>
+          <div className="mx-auto max-w-7xl w-full">{children}</div>
         </div>
       </SidebarInset>
     </SidebarProvider>

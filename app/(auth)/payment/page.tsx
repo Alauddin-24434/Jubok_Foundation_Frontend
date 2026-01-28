@@ -1,44 +1,42 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { toast } from 'sonner';
+import { useState } from "react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
-import { useInitiatePaymentMutation } from '@/redux/features/payment/paymentApi';
+import { useInitiatePaymentMutation } from "@/redux/features/payment/paymentApi";
 
-type PaymentType = 'MEMBERSHIP' | 'MONTHLY_FUND';
+type PaymentType = "MEMBERSHIP" | "MONTHLY_FUND";
 
 export default function PaymentPage() {
-  const [initiatePayment, { isLoading }] =
-    useInitiatePaymentMutation();
+  const [initiatePayment, { isLoading }] = useInitiatePaymentMutation();
 
-  const [paymentType, setPaymentType] =
-    useState<PaymentType>('MEMBERSHIP');
+  const [paymentType, setPaymentType] = useState<PaymentType>("MEMBERSHIP");
 
   const [form, setForm] = useState({
     amount: 1000,
-    method: 'BKASH',
-    purpose: 'ACCOUNT_ACTIVATION',
-    senderNumber: '',
-    transactionId: '',
+    method: "BKASH",
+    purpose: "ACCOUNT_ACTIVATION",
+    senderNumber: "",
+    transactionId: "",
   });
 
   // 🔁 handle payment type change
   const handleTypeChange = (type: PaymentType) => {
-    if (type === 'MEMBERSHIP') {
+    if (type === "MEMBERSHIP") {
       setForm({
         ...form,
         amount: 1000,
-        purpose: 'ACCOUNT_ACTIVATION',
+        purpose: "ACCOUNT_ACTIVATION",
       });
     } else {
       setForm({
         ...form,
         amount: 1500,
-        purpose: 'MONTHLY_FUND',
+        purpose: "MONTHLY_FUND",
       });
     }
     setPaymentType(type);
@@ -49,25 +47,21 @@ export default function PaymentPage() {
 
     try {
       await initiatePayment(form).unwrap();
-      toast.success(
-        'Payment submitted. Waiting for admin approval.',
-      );
+      toast.success("Payment submitted. Waiting for admin approval.");
       setForm({
         ...form,
-        senderNumber: '',
-        transactionId: '',
+        senderNumber: "",
+        transactionId: "",
       });
     } catch (err: any) {
-      toast.error(err?.data?.message || 'Payment failed');
+      toast.error(err?.data?.message || "Payment failed");
     }
   };
 
   return (
     <div className="flex justify-center p-6">
       <Card className="w-full max-w-md p-6 space-y-4">
-        <h1 className="text-xl font-bold text-center">
-          Manual Payment
-        </h1>
+        <h1 className="text-xl font-bold text-center">Manual Payment</h1>
 
         {/* 🔘 Payment Type */}
         <div className="space-y-2">
@@ -78,10 +72,8 @@ export default function PaymentPage() {
               <input
                 type="radio"
                 name="paymentType"
-                checked={paymentType === 'MEMBERSHIP'}
-                onChange={() =>
-                  handleTypeChange('MEMBERSHIP')
-                }
+                checked={paymentType === "MEMBERSHIP"}
+                onChange={() => handleTypeChange("MEMBERSHIP")}
               />
               Membership
             </label>
@@ -90,10 +82,8 @@ export default function PaymentPage() {
               <input
                 type="radio"
                 name="paymentType"
-                checked={paymentType === 'MONTHLY_FUND'}
-                onChange={() =>
-                  handleTypeChange('MONTHLY_FUND')
-                }
+                checked={paymentType === "MONTHLY_FUND"}
+                onChange={() => handleTypeChange("MONTHLY_FUND")}
               />
               Monthly Fund
             </label>
@@ -155,14 +145,8 @@ export default function PaymentPage() {
             />
           </div>
 
-          <Button
-            type="submit"
-            disabled={isLoading}
-            className="w-full"
-          >
-            {isLoading
-              ? 'Submitting...'
-              : 'Submit Payment'}
+          <Button type="submit" disabled={isLoading} className="w-full">
+            {isLoading ? "Submitting..." : "Submit Payment"}
           </Button>
         </form>
       </Card>

@@ -1,14 +1,22 @@
-'use client';
+"use client";
 
-import { useGetProjectQuery } from '@/redux/features/project/projectApi';
-import { useParams } from 'next/navigation';
-import Image from 'next/image';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { useTranslation } from 'react-i18next';
-import { MapPin, Calendar, Users, Banknote, Phone, Info, Video } from 'lucide-react';
-import YouTubePreview from '@/components/shared/YouTubePreview';
+import { useGetProjectQuery } from "@/redux/features/project/projectApi";
+import { useParams } from "next/navigation";
+import Image from "next/image";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { useTranslation } from "react-i18next";
+import {
+  MapPin,
+  Calendar,
+  Users,
+  Banknote,
+  Phone,
+  Info,
+  Video,
+} from "lucide-react";
+import YouTubePreview from "@/components/shared/YouTubePreview";
 
 export default function ProjectDetailsPage() {
   const { id } = useParams();
@@ -27,14 +35,19 @@ export default function ProjectDetailsPage() {
     );
   }
 
-  if (!project) return <div className="text-center py-20">{t('no_projects')}</div>;
+  if (!project)
+    return <div className="text-center py-20">{t("no_projects")}</div>;
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'ongoing': return 'bg-green-500';
-      case 'upcoming': return 'bg-blue-500';
-      case 'expired': return 'bg-red-500';
-      default: return 'bg-gray-500';
+      case "ongoing":
+        return "bg-green-500";
+      case "upcoming":
+        return "bg-blue-500";
+      case "expired":
+        return "bg-red-500";
+      default:
+        return "bg-gray-500";
     }
   };
 
@@ -42,14 +55,16 @@ export default function ProjectDetailsPage() {
     <div className="container mx-auto space-y-12 min-h-screen py-10 ">
       <div className="relative h-[450px] w-full rounded-2xl overflow-hidden shadow-2xl mt-20">
         <Image
-          src={project.thumbnail || '/placeholder-project.jpg'}
+          src={project.thumbnail || "/placeholder-project.jpg"}
           alt={project.name}
           fill
           className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
         <div className="absolute bottom-8 left-8 right-8">
-          <Badge className={`mb-4 ${getStatusColor(project.status)} text-base px-4 py-1`}>
+          <Badge
+            className={`mb-4 ${getStatusColor(project.status)} text-base px-4 py-1`}
+          >
             {t(project.status)}
           </Badge>
           <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight">
@@ -102,19 +117,26 @@ export default function ProjectDetailsPage() {
                 <span className="text-muted-foreground flex items-center gap-2">
                   <Banknote className="h-5 w-5" /> Initial Investment
                 </span>
-                <span className="font-bold text-primary">৳{(project.intialInvestment || 0).toLocaleString()}</span>
+                <span className="font-bold text-primary">
+                  ৳{(project.intialInvestment || 0).toLocaleString()}
+                </span>
               </div>
               <div className="flex justify-between items-center text-lg">
                 <span className="text-muted-foreground flex items-center gap-2">
-                  <Banknote className="h-5 w-5 text-secondary" /> Total Investment
+                  <Banknote className="h-5 w-5 text-secondary" /> Total
+                  Investment
                 </span>
-                <span className="font-bold text-secondary">৳{(project.totalInvestment || 0).toLocaleString()}</span>
+                <span className="font-bold text-secondary">
+                  ৳{(project.totalInvestment || 0).toLocaleString()}
+                </span>
               </div>
               <div className="flex justify-between items-center text-lg">
                 <span className="text-muted-foreground flex items-center gap-2">
                   <Users className="h-5 w-5" /> Core Team
                 </span>
-                <span className="font-bold">{project.members?.length || 0}</span>
+                <span className="font-bold">
+                  {project.members?.length || 0}
+                </span>
               </div>
             </div>
 
@@ -137,7 +159,10 @@ export default function ProjectDetailsPage() {
                 </div>
                 <div>
                   <p className="font-bold">Timeline</p>
-                  <p>{new Date(project.startDate).toLocaleDateString()} - {new Date(project.endDate).toLocaleDateString()}</p>
+                  <p>
+                    {new Date(project.startDate).toLocaleDateString()} -{" "}
+                    {new Date(project.endDate).toLocaleDateString()}
+                  </p>
                 </div>
               </div>
 
@@ -151,10 +176,13 @@ export default function ProjectDetailsPage() {
                 </div>
               </div>
             </div>
-            
+
             <div className="bg-primary/5 p-4 rounded-lg text-center text-sm text-primary border border-primary/10">
-               <Info className="w-4 h-4 mx-auto mb-2" />
-               <p>All active foundation members are automatically partners in this project.</p>
+              <Info className="w-4 h-4 mx-auto mb-2" />
+              <p>
+                All active foundation members are automatically partners in this
+                project.
+              </p>
             </div>
           </div>
         </div>

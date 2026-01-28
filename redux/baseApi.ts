@@ -52,7 +52,7 @@ const baseQuery = fetchBaseQuery({
 const baseQueryWithReauth: typeof baseQuery = async (
   args,
   api,
-  extraOptions
+  extraOptions,
 ) => {
   // console.log("➡️ API Request Started:", args);
 
@@ -83,7 +83,7 @@ const baseQueryWithReauth: typeof baseQuery = async (
         const refreshResult = await baseQuery(
           { url: "/auth/refresh-token", method: "POST" },
           api,
-          extraOptions
+          extraOptions,
         );
 
         // console.log("📦 Refresh response:", refreshResult);
@@ -97,7 +97,7 @@ const baseQueryWithReauth: typeof baseQuery = async (
             setUser({
               user: refreshData.data.user,
               accessToken: refreshData.data.accessToken,
-            })
+            }),
           );
 
           // console.log("🔁 Retrying original request");
@@ -124,7 +124,6 @@ const baseQueryWithReauth: typeof baseQuery = async (
   return result;
 };
 
-
 /**
  * ============================
  * Base API
@@ -133,7 +132,15 @@ const baseQueryWithReauth: typeof baseQuery = async (
 const baseApi = createApi({
   reducerPath: "baseApi",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["User", "Auth", "Project", "Banner", "Payment", "Fund", "Management"],
+  tagTypes: [
+    "User",
+    "Auth",
+    "Project",
+    "Banner",
+    "Payment",
+    "Fund",
+    "Management",
+  ],
   endpoints: () => ({}),
 });
 

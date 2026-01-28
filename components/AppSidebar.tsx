@@ -57,7 +57,12 @@ export const sidebarItems: SidebarItem[] = [
     title: "Command Center",
     url: "/dashboard",
     icon: Home,
-    roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MEMBER, UserRole.GUEST],
+    roles: [
+      UserRole.SUPER_ADMIN,
+      UserRole.ADMIN,
+      UserRole.MEMBER,
+      UserRole.GUEST,
+    ],
   },
   {
     title: "Member Directory",
@@ -105,7 +110,12 @@ export const sidebarItems: SidebarItem[] = [
     title: "Identity Settings",
     url: "/dashboard/settings",
     icon: Settings,
-    roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MEMBER, UserRole.GUEST],
+    roles: [
+      UserRole.SUPER_ADMIN,
+      UserRole.ADMIN,
+      UserRole.MEMBER,
+      UserRole.GUEST,
+    ],
   },
 ];
 
@@ -129,16 +139,16 @@ export function AppSidebar({ user }: AppSidebarProps) {
     try {
       // 1. Call backend to clear cookie
       await logoutUser({}).unwrap();
-      
+
       // 2. Clear Redux state
       dispatch(logout());
-      
+
       // 3. Reset RTK Query cache
       dispatch(baseApi.util.resetApiState());
-      
+
       // 4. Show success message
       toast.success("Security session terminated successfully");
-      
+
       // 5. Redirect to login
       router.push("/login");
     } catch (error) {
@@ -153,7 +163,6 @@ export function AppSidebar({ user }: AppSidebarProps) {
   //======================   SUB-COMPONENTS   ===============================
   return (
     <Sidebar className="border-r border-sidebar-border bg-sidebar shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
-      
       {/* 👤 LEADERSHIP IDENTITY PANEL */}
       <SidebarHeader className="pb-4 pt-8 px-3">
         <Link
@@ -162,7 +171,11 @@ export function AppSidebar({ user }: AppSidebarProps) {
         >
           <div className="relative shrink-0">
             <Avatar className="h-12 w-12 border-2 border-primary/20 shrink-0 shadow-lg ring-offset-2 ring-primary/5 transition-all duration-500 rounded-2xl group-hover:rounded-xl">
-              <AvatarImage src={user?.profilePhoto} alt={user?.name} className="object-cover" />
+              <AvatarImage
+                src={user?.profilePhoto}
+                alt={user?.name}
+                className="object-cover"
+              />
               <AvatarFallback className="bg-primary text-primary-foreground font-black text-lg uppercase">
                 {user?.name?.charAt(0) || "U"}
               </AvatarFallback>
@@ -207,11 +220,17 @@ export function AppSidebar({ user }: AppSidebarProps) {
                           href={item.url}
                           className="flex items-center gap-3 w-full"
                         >
-                          <item.icon className={`w-4 h-4 transition-all duration-300 ${isActive ? "scale-110" : "group-hover/menu:scale-110"}`} />
-                          <span className={`text-xs font-bold tracking-tight transition-all duration-300 ${isActive ? "translate-x-1" : ""}`}>{item.title}</span>
+                          <item.icon
+                            className={`w-4 h-4 transition-all duration-300 ${isActive ? "scale-110" : "group-hover/menu:scale-110"}`}
+                          />
+                          <span
+                            className={`text-xs font-bold tracking-tight transition-all duration-300 ${isActive ? "translate-x-1" : ""}`}
+                          >
+                            {item.title}
+                          </span>
                           {isActive && (
                             <div className="ml-auto">
-                               <ChevronRight size={12} className="opacity-50" />
+                              <ChevronRight size={12} className="opacity-50" />
                             </div>
                           )}
                         </Link>
@@ -238,5 +257,3 @@ export function AppSidebar({ user }: AppSidebarProps) {
     </Sidebar>
   );
 }
-
-
