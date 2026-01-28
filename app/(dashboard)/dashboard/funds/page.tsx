@@ -1,330 +1,141 @@
 "use client";
 
+//==================================================================================
+//                               FUNDS MANAGEMENT
+//==================================================================================
+// Description: Core module for tracking foundation finances, income, and expenses.
+// Features: Real-time summary, PDF report generation, and transaction history.
+//==================================================================================
+
 import { useState } from "react";
-import {
-  Table,
-  TableHead,
-  TableRow,
-  TableHeader,
-  TableBody,
-  TableCell,
-} from "@/components/ui/table";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { FileText, Settings, Loader2, DollarSign } from "lucide-react";
 import {
+  useAddFundTransactionMutation,
   useGetFundHistoryQuery,
   useGetFundSummaryQuery,
 } from "@/redux/features/fundApi/fundApi";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
+import { AddTransactionForm } from "@/components/funds/AddTransactionForm";
+import { generateFundPDF } from "@/lib/pdfGenerator";
+import { TransactionTable } from "@/components/funds/TransactionTable";
+import { SummaryCards } from "@/components/funds/SummaryCards";
+import { AFPageHeader } from "@/components/shared/AFPageHeader";
 
 export default function FundDashboard() {
+  //======================   STATE & HOOKS   ===============================
   const [limit, setLimit] = useState(20);
   const [search, setSearch] = useState("");
-
-  // নতুন স্টেট: নাম এবং পদবী
   const [sigName, setSigName] = useState("");
   const [sigDesignation, setSigDesignation] = useState("");
 
-  const { data: summary, isLoading: summaryLoading } = useGetFundSummaryQuery();
-  const { data: history, isLoading: historyLoading } = useGetFundHistoryQuery({
+  const { data: summary, isLoading: sLoading } = useGetFundSummaryQuery();
+  const { data: history, isLoading: hLoading } = useGetFundHistoryQuery({
     limit,
   });
+  const [addTransaction, { isLoading: adding }] = useAddFundTransactionMutation();
 
-  if (summaryLoading || historyLoading)
-    return <p className="p-6">Loading fund data...</p>;
-
-  const filteredHistory = history?.filter(
-    (tx) =>
-      tx.reason.toLowerCase().includes(search.toLowerCase()) ||
-      tx.createdBy?.name?.toLowerCase().includes(search.toLowerCase()) ||
-      tx.createdBy?.email?.toLowerCase().includes(search.toLowerCase()),
-  );
-
-  const viewMonthlyInvoicePDF = async () => {
-    if (!history) return;
-
-    const pdf = new jsPDF("p", "mm", "a4") as any;
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
-    const now = new Date();
-
-    // 🎨 ১. স্মল সিল ওয়াটারমার্ক (পুরো পেজ জুড়ে)
-    pdf.saveGraphicsState();
-    pdf.setGState(new (pdf as any).GState({ opacity: 0.03 })); // খুবই হালকা (৩%)
-    for (let x = 10; x < pageWidth; x += 40) {
-      for (let y = 10; y < pageHeight; y += 40) {
-        try {
-          pdf.addImage("/images/SEAL.png", "PNG", x, y, 15, 15);
-        } catch (e) {}
-      }
-    }
-    pdf.restoreGraphicsState();
-
-    // 🎨 ২. মেইন সেন্টার ওয়াটারমার্ক
-    pdf.saveGraphicsState();
-    pdf.setGState(new (pdf as any).GState({ opacity: 0.07 })); // ৭% ট্রান্সপারেন্সি
-    pdf.setFontSize(50);
-    pdf.setFont(undefined, "bold");
-    pdf.setTextColor(100);
-    // পেজের ঠিক মাঝখানে সেন্টারে
-    pdf.text("ALHAMDULILLAH FOUNDATION", pageWidth / 1.5, pageHeight / 1.4, {
-      align: "center",
-      angle: 45,
-    });
-
-    pdf.restoreGraphicsState();
-
-    // ৩. হেডার
-    pdf.setFontSize(22);
-    pdf.setTextColor(41, 128, 185);
-  
-    pdf.text("AF MONTHLY FUND INVOICE", pageWidth / 2, 20, { align: "center" });
-
-    // ৪. পিরিয়ড ও তারিখ
-    pdf.setFontSize(10);
-    pdf.setTextColor(80);
-    const oneMonthAgo = new Date();
-    oneMonthAgo.setMonth(now.getMonth() - 1);
-    pdf.text(
-      `Period: ${oneMonthAgo.toLocaleDateString()} - ${now.toLocaleDateString()}`,
-      14,
-      30,
+  //======================   RENDER LOGIC   ===============================
+  if (sLoading || hLoading) {
+    return (
+      <div className="flex h-[400px] flex-col items-center justify-center gap-4">
+        <Loader2 className="h-10 w-10 animate-spin text-primary/30" />
+        <p className="text-muted-foreground font-medium animate-pulse">Fetching financial records...</p>
+      </div>
     );
-    pdf.text(`Generated: ${now.toLocaleString()}`, pageWidth - 14, 30, {
-      align: "right",
-    });
+  }
 
-    // ৫. ট্রানজেকশন টেবিল
-    const lastMonthTx = history.filter(
-      (tx) => new Date(tx.createdAt) >= oneMonthAgo,
-    );
-    const tableRows = lastMonthTx.map((tx) => [
-      new Date(tx.createdAt).toLocaleDateString(),
-      tx.createdBy?.name || "N/A",
-      tx.type,
-      tx.amount.toLocaleString(),
-      tx.balanceSnapshot.toLocaleString(),
-      tx.reason,
-    ]);
-
-    autoTable(pdf, {
-      startY: 35,
-      head: [["Date", "User Name", "Type", "Amount", "Balance", "Reason"]],
-      body: tableRows,
-      theme: "grid",
-      headStyles: { fillColor: [41, 128, 185], textColor: 255 },
-      // টেবিলের ব্যাকগ্রাউন্ডে যেন ওয়াটারমার্ক হালকা দেখা যায়
-      styles: { fontSize: 9, cellPadding: 3, fillColor: [255, 255, 255, 0.85] },
-    });
-
-    // ৬. ব্যালেন্স সামারি
-    const finalTableY = (pdf as any).lastAutoTable.finalY + 10;
-    pdf.setFont(undefined, "bold");
-    pdf.setTextColor(0);
-    pdf.text(
-      `Total Current Balance: ${(summary?.currentBalance || 0).toLocaleString()} BDT`,
-      pageWidth - 14,
-      finalTableY,
-      { align: "right" },
-    );
-
-    // ৭. ফুটার (সিগনেচার ও বড় সিল)
-    const footerY = pageHeight - 45;
-
-    try {
-      // মেইন সিল ইমেজ (সাইজ বড় করা হয়েছে - ৪৫x৪৫)
-      const sealX = pageWidth - 60;
-      pdf.addImage("/images/SEAL.png", "PNG", sealX, footerY - 20, 45, 45);
-
-      // VERIFIED স্ট্যাম্প
-      pdf.setTextColor(39, 174, 96);
-      pdf.setFontSize(16);
-      pdf.text("VERIFIED", sealX + 22, footerY + 2, {
-        align: "center",
-        angle: -15,
-      });
-
-      // টাইপ করা সিগনেচার
-      pdf.setTextColor(0, 0, 150);
-      pdf.setFont("times", "italic", "bold");
-      pdf.setFontSize(18);
-      pdf.text(sigName, 14, footerY);
-
-      pdf.setFont("helvetica", "normal");
-      pdf.setFontSize(11);
-      pdf.setTextColor(0);
-      pdf.text("________________________", 14, footerY + 2);
-      pdf.setFont(undefined, "bold");
-      pdf.text(sigDesignation || "Authorized Person", 14, footerY + 8);
-
-      pdf.setFont(undefined, "normal");
-      pdf.setFontSize(8);
-      pdf.setTextColor(120);
-      pdf.text(`Signed on: ${now.toLocaleDateString()}`, 14, footerY + 13);
-    } catch (error) {
-      console.warn("Images not found");
-    }
-
-    // লাইসেন্স ইনফো
-    pdf.setFontSize(9);
-    pdf.setTextColor(150);
-    pdf.text(`License No: AF-123456`, 14, pageHeight - 10);
-
-    const blobURL = pdf.output("bloburl");
-    window.open(blobURL, "_blank");
-  };
-
+  //======================   MAIN VIEW   ===============================
   return (
-    <div className="p-6 space-y-8 bg-gray-50 min-h-screen">
-      {/* 💰 SUMMARY CARDS */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="bg-green-50 border-green-200">
-          <CardHeader className="pb-2 text-center">
-            <CardTitle className="text-sm text-green-600 uppercase">
-              Total Income
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="text-2xl font-bold text-green-700 text-center">
-            ৳ {summary?.totalIncome?.toLocaleString() || 0}
-          </CardContent>
-        </Card>
-        <Card className="bg-red-50 border-red-200">
-          <CardHeader className="pb-2 text-center">
-            <CardTitle className="text-sm text-red-600 uppercase">
-              Total Expense
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="text-2xl font-bold text-red-700 text-center">
-            ৳ {summary?.totalExpense?.toLocaleString() || 0}
-          </CardContent>
-        </Card>
-        <Card className="bg-blue-50 border-blue-200">
-          <CardHeader className="pb-2 text-center">
-            <CardTitle className="text-sm text-blue-600 uppercase">
-              Current Balance
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="text-2xl font-bold text-blue-700 text-center">
-            ৳ {summary?.currentBalance?.toLocaleString() || 0}
-          </CardContent>
-        </Card>
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
+      
+      {/* Header Section */}
+      <AFPageHeader 
+        title="Fund Governance"
+        description="Monitor liquidity, track expenditures, and audited financial reporting."
+      />
+
+      {/* 💰 FINANCIAL SUMMARY OVERVIEW */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <SummaryCards summary={summary} />
       </div>
 
-      {/* 🛠️ INVOICE CONTROL PANEL (Updated with Designation) */}
-      <Card className="border-2 border-blue-100 shadow-md">
-        <CardHeader className="bg-blue-50/50">
-          <CardTitle className="text-lg text-blue-700">
-            Invoice Generation Settings
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6">
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-gray-700">
-              Signatory Name
-            </label>
-            <Input
-              placeholder="e.g. Md. Abdul Karim"
-              value={sigName}
-              onChange={(e) => setSigName(e.target.value)}
-              className="bg-white border-blue-200"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-gray-700">
-              Designation (Podobi)
-            </label>
-            <Input
-              placeholder="e.g. President / Secretary"
-              value={sigDesignation}
-              onChange={(e) => setSigDesignation(e.target.value)}
-              className="bg-white border-blue-200"
-            />
-          </div>
-          <div className="flex items-end">
-            <Button
-              onClick={viewMonthlyInvoicePDF}
-              disabled={!sigName || !sigDesignation}
-              className="w-full bg-blue-600 hover:bg-blue-800 text-white font-bold h-10 shadow-lg"
-            >
-              Generate & Preview PDF
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* 📊 HISTORY TABLE SECTION */}
-      <div className="bg-white p-6 rounded-xl border shadow-sm space-y-4">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <Input
-            placeholder="Search by reason or user..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="max-w-md shadow-sm"
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        {/* ➕ NEW TRANSACTION FORM (Left/Top) */}
+        <div className="xl:col-span-2">
+          <AddTransactionForm
+            onAdd={async (data: any) => await addTransaction(data).unwrap()}
+            adding={adding}
           />
-          <div className="flex gap-2">
-            {[10, 20, 50].map((num) => (
-              <Button
-                key={num}
-                size="sm"
-                variant={limit === num ? "default" : "outline"}
-                onClick={() => setLimit(num)}
-              >
-                Last {num}
-              </Button>
-            ))}
-          </div>
         </div>
 
-        <div className="rounded-md border overflow-hidden">
-          <Table>
-            <TableHeader className="bg-gray-100">
-              <TableRow>
-                <TableHead>User</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead className="text-right">Amount</TableHead>
-                <TableHead className="text-right">Balance</TableHead>
-                <TableHead>Reason</TableHead>
-                <TableHead>Date</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredHistory?.map((tx) => (
-                <TableRow
-                  key={tx._id}
-                  className="hover:bg-gray-50 transition-colors"
-                >
-                  <TableCell>
-                    <div className="font-medium">{tx.createdBy?.name}</div>
-                    <div className="text-[10px] text-gray-400">
-                      {tx.createdBy?.email}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <span
-                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${tx.type === "INCOME" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}
-                    >
-                      {tx.type}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right font-bold text-gray-800">
-                    ৳ {tx.amount.toLocaleString()}
-                  </TableCell>
-                  <TableCell className="text-right text-gray-500">
-                    ৳ {tx.balanceSnapshot.toLocaleString()}
-                  </TableCell>
-                  <TableCell className="max-w-[180px] text-sm text-gray-600 truncate">
-                    {tx.reason}
-                  </TableCell>
-                  <TableCell className="text-xs text-gray-500">
-                    {new Date(tx.createdAt).toLocaleDateString()}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+        {/* 🛠️ REPORT GENERATION SETTINGS (Right) */}
+        <div className="space-y-6">
+          <Card className="border-2 border-primary/10 shadow-xl rounded-2xl overflow-hidden bg-card/50 backdrop-blur-sm">
+            <CardHeader className="bg-primary/5 border-b border-primary/10">
+              <CardTitle className="text-sm font-black uppercase tracking-widest flex items-center gap-2 text-primary">
+                <Settings size={16} />
+                Report Settings
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 pt-6">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold uppercase text-muted-foreground ml-1">Signatory Name</label>
+                <Input
+                  placeholder="e.g. Abdullah Al Mamun"
+                  className="rounded-xl border-muted-foreground/20 focus:ring-primary/20 h-11"
+                  value={sigName}
+                  onChange={(e) => setSigName(e.target.value)}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold uppercase text-muted-foreground ml-1">Official Designation</label>
+                <Input
+                  placeholder="e.g. Chairman"
+                  className="rounded-xl border-muted-foreground/20 focus:ring-primary/20 h-11"
+                  value={sigDesignation}
+                  onChange={(e) => setSigDesignation(e.target.value)}
+                />
+              </div>
+              <Button
+                onClick={() =>
+                  generateFundPDF(history || [], summary, sigName, sigDesignation)
+                }
+                disabled={!sigName || !sigDesignation}
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-black rounded-xl h-11 shadow-lg shadow-primary/20 transition-all hover:scale-[1.02]"
+              >
+                <FileText size={18} className="mr-2" />
+                Generate Audit PDF
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Tips Card */}
+          <div className="p-6 bg-amber-500/5 border border-amber-500/10 rounded-2xl">
+            <h4 className="text-amber-600 font-bold text-sm mb-2">Financial Integrity Tip</h4>
+            <p className="text-xs text-amber-700/70 leading-relaxed font-medium">
+              Always attach evidence/receipts for expenses above ৳1,000 to maintain auditing standards.
+            </p>
+          </div>
         </div>
+      </div>
+
+      {/* 📊 TRANSACTION AUDIT HISTORY */}
+      <div className="rounded-2xl overflow-hidden bg-card border border-muted/30 shadow-2xl">
+        <div className="p-6 border-b border-muted/30 bg-muted/5">
+           <h3 className="text-lg font-black text-foreground flex items-center gap-2">
+             <DollarSign size={20} className="text-primary" />
+             Transaction Audit Log
+           </h3>
+        </div>
+        <TransactionTable
+          history={history}
+          search={search}
+          setSearch={setSearch}
+          limit={limit}
+          setLimit={setLimit}
+        />
       </div>
     </div>
   );

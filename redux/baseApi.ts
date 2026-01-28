@@ -54,30 +54,31 @@ const baseQueryWithReauth: typeof baseQuery = async (
   api,
   extraOptions
 ) => {
-  console.log("➡️ API Request Started:", args);
+  // console.log("➡️ API Request Started:", args);
 
   // wait if another refresh is running
   await mutex.waitForUnlock();
 
   let result = await baseQuery(args, api, extraOptions);
+  // console.log(result)
 
-  if (result.error) {
-    console.error("❌ API Error:", {
-      url: args,
-      status: result.error.status,
-      error: result.error,
-    });
-  }
+  // if (result.error) {
+  //   console.error("❌ API Error:", {
+  //     url: args,
+  //     status: result.error.status,
+  //     error: result.error,
+  //   });
+  // }
 
   if (result.error?.status === 401) {
-    console.warn("🔐 401 Unauthorized detected");
+    // console.warn("🔐 401 Unauthorized detected");
 
     if (!mutex.isLocked()) {
-      console.log("🔓 Mutex free → acquiring lock");
+      // console.log("🔓 Mutex free → acquiring lock");
       const release = await mutex.acquire();
 
       try {
-        console.log("🔄 Calling refresh-token API");
+        // console.log("🔄 Calling refresh-token API");
 
         const refreshResult = await baseQuery(
           { url: "/auth/refresh-token", method: "POST" },
@@ -85,12 +86,12 @@ const baseQueryWithReauth: typeof baseQuery = async (
           extraOptions
         );
 
-        console.log("📦 Refresh response:", refreshResult);
+        // console.log("📦 Refresh response:", refreshResult);
 
         const refreshData = refreshResult.data as IRefreshResponse;
 
         if (refreshData?.data?.accessToken) {
-          console.log("✅ New access token received");
+          // console.log("✅ New access token received");
 
           api.dispatch(
             setUser({
@@ -99,21 +100,21 @@ const baseQueryWithReauth: typeof baseQuery = async (
             })
           );
 
-          console.log("🔁 Retrying original request");
+          // console.log("🔁 Retrying original request");
           result = await baseQuery(args, api, extraOptions);
         } else {
-          console.error("🚫 Refresh failed → logging out");
+          // console.error("🚫 Refresh failed → logging out");
           api.dispatch(logout());
         }
       } catch (err) {
-        console.error("💥 Refresh token error:", err);
+        // console.error("💥 Refresh token error:", err);
         api.dispatch(logout());
       } finally {
-        console.log("🔓 Releasing mutex lock");
+        // console.log("🔓 Releasing mutex lock");
         release();
       }
     } else {
-      console.log("⏳ Waiting for ongoing refresh to finish");
+      // console.log("⏳ Waiting for ongoing refresh to finish");
       await mutex.waitForUnlock();
       result = await baseQuery(args, api, extraOptions);
     }
@@ -132,7 +133,7 @@ const baseQueryWithReauth: typeof baseQuery = async (
 const baseApi = createApi({
   reducerPath: "baseApi",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["User", "Auth", "Project", "Banner", "Payments"],
+  tagTypes: ["User", "Auth", "Project", "Banner", "Payment", "Fund", "Management"],
   endpoints: () => ({}),
 });
 

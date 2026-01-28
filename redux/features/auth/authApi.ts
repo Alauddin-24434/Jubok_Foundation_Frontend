@@ -21,7 +21,6 @@ const authApi = baseApi.injectEndpoints({
       query: (body) => ({
         url: "/auth/login",
         method: "POST",
-
         body,
       }),
     }),
@@ -60,7 +59,13 @@ const authApi = baseApi.injectEndpoints({
       providesTags: ["Auth"],
     }),
 
- 
+    // ===== ✅ Logout user =====
+    logoutUser: build.mutation({
+      query: () => ({
+        url: "/auth/logout",
+        method: "POST",
+      }),
+    }),
   }),
 });
 
@@ -71,7 +76,7 @@ export const {
   useGetMeQuery,
   useGetUsersQuery,
   useGetStatsQuery,
-
+  useLogoutUserMutation,
 } = authApi;
 
 export default authApi;

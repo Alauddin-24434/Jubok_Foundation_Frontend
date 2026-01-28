@@ -4,14 +4,14 @@ import { RootState } from "../../store";
 export enum UserRole {
   SUPER_ADMIN = 'SUPER_ADMIN',
   ADMIN = 'ADMIN',
-  MODERATOR = 'MODERATOR',
-  USER = 'USER',
+  MEMBER = 'MEMBER',
+  GUEST='GUEST'
+
 }
 
 export enum UserStatus {
   ACTIVE = 'ACTIVE',
   PENDING = 'PENDING',
-  INACTIVE = 'INACTIVE',
   SUSPENDED = 'SUSPENDED',
 }
 

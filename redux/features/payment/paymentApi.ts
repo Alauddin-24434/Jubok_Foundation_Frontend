@@ -8,7 +8,7 @@ export const paymentApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["Payments"],
+      invalidatesTags: ["Payment"],
     }),
 
     // redux/features/payment/paymentApi.ts
@@ -17,7 +17,7 @@ export const paymentApi = baseApi.injectEndpoints({
         url: "/payments",
         params,
       }),
-      providesTags: ["Payments"],
+      providesTags: ["Payment"],
     }),
 
     approvePayment: builder.mutation({
@@ -25,7 +25,7 @@ export const paymentApi = baseApi.injectEndpoints({
         url: `/payments/${paymentId}/approve`,
         method: "PATCH",
       }),
-      invalidatesTags: ["Payments"],
+      invalidatesTags: ["Payment"],
     }),
   }),
 });

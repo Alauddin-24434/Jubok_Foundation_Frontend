@@ -6,6 +6,7 @@ import "./globals.css";
 import ReduxProvider from "@/components/shared/ReduxProvider";
 import { I18nProvider } from "@/components/shared/I18nProvider";
 import { ThemeProvider } from "@/components/shared/ThemeProvider";
+import { SocketProvider } from "@/providers/SocketProvider";
 import Script from "next/script";
 
 const geist = Geist({
@@ -72,7 +73,9 @@ export default function RootLayout({
               enableSystem
               disableTransitionOnChange
             >
-              {children}
+              <SocketProvider>
+                {children}
+              </SocketProvider>
             </ThemeProvider>
           </I18nProvider>
           <Analytics />

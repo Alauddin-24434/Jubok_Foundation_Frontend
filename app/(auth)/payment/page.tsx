@@ -19,7 +19,7 @@ export default function PaymentPage() {
     useState<PaymentType>('MEMBERSHIP');
 
   const [form, setForm] = useState({
-    amount: 500,
+    amount: 1000,
     method: 'BKASH',
     purpose: 'ACCOUNT_ACTIVATION',
     senderNumber: '',
@@ -37,7 +37,7 @@ export default function PaymentPage() {
     } else {
       setForm({
         ...form,
-        amount: 1000,
+        amount: 1500,
         purpose: 'MONTHLY_FUND',
       });
     }
