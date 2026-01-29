@@ -63,7 +63,8 @@ export function ManagementForm({
         : "",
       endAt: initialData?.endAt
         ? new Date(initialData.endAt).toISOString().split("T")[0]
-        : "",
+        : undefined,
+
       isActive: initialData ? initialData.isActive : true,
     },
   });
@@ -147,7 +148,14 @@ export function ManagementForm({
               <FormItem>
                 <FormLabel>End Date (Optional)</FormLabel>
                 <FormControl>
-                  <Input type="date" {...field} value={field.value || ""} />
+                  <Input
+                    type="date"
+                    {...field}
+                    value={field.value || ""}
+                    onChange={(e) =>
+                      field.onChange(e.target.value || undefined)
+                    }
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

@@ -29,7 +29,7 @@ const mutex = new Mutex();
  * ============================
  */
 const baseQuery = fetchBaseQuery({
-  baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
+  baseUrl: `${process.env.NEXT_PUBLIC_API_BASE_URL}/api`,
   credentials: "include",
   prepareHeaders: (headers, { getState }) => {
     const state = getState() as RootState;
@@ -120,7 +120,7 @@ const baseQueryWithReauth: typeof baseQuery = async (
     }
   }
 
-  console.log("✅ API Request Finished:", args);
+  // console.log("✅ API Request Finished:", args);
   return result;
 };
 
@@ -140,6 +140,7 @@ const baseApi = createApi({
     "Payment",
     "Fund",
     "Management",
+    "Notice"
   ],
   endpoints: () => ({}),
 });

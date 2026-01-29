@@ -27,6 +27,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { PublicNotificationBell } from "@/components/shared/notificationBell";
 
 export default function DashboardLayout({
   children,
@@ -57,6 +58,7 @@ export default function DashboardLayout({
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
+            <PublicNotificationBell />
             {/* Theme Toggle Button */}
             <Button
               variant="ghost"

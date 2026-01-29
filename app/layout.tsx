@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
-import ReduxProvider from "@/components/shared/ReduxProvider";
+import ReduxProvider from "@/providers/ReduxProvider";
 import { I18nProvider } from "@/components/shared/I18nProvider";
 import { ThemeProvider } from "@/components/shared/ThemeProvider";
 import { SocketProvider } from "@/providers/SocketProvider";
