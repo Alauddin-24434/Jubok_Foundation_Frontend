@@ -15,17 +15,19 @@ import { setUser } from "@/redux/features/auth/authSlice";
 import CloudinaryUpload from "@/components/shared/CloudinaryUpload";
 import { z } from "zod";
 
-const signupSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  email: z.string().email("Invalid email address"),
-  phone: z.string().min(11, "Phone number is required"),
-  address: z.string().min(1, "Address is required"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords do not match",
-  path: ["confirmPassword"],
-});
+const signupSchema = z
+  .object({
+    name: z.string().min(1, "Name is required"),
+    email: z.string().email("Invalid email address"),
+    phone: z.string().min(11, "Phone number is required"),
+    address: z.string().min(1, "Address is required"),
+    password: z.string().min(6, "Password must be at least 6 characters"),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 export default function SignupPage() {
   const router = useRouter();
@@ -50,58 +52,57 @@ export default function SignupPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setError("");
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
 
-  const validation = signupSchema.safeParse(formData);
+    const validation = signupSchema.safeParse(formData);
 
-  if (!validation.success) {
-    const firstError =
-      validation.error.errors[0]?.message || "Invalid form data";
+    if (!validation.success) {
+      const firstError =
+        validation.error.errors[0]?.message || "Invalid form data";
 
-    toast({
-      variant: "destructive",
-      title: "Validation Error",
-      description: firstError,
-    });
+      toast({
+        variant: "destructive",
+        title: "Validation Error",
+        description: firstError,
+      });
 
-    return;
-  }
+      return;
+    }
 
-  try {
-    const res = await signUpUser({
-      avatar: formData.avatar,
-      name: formData.name,
-      email: formData.email,
-      phone: formData.phone,
-      address: formData.address,
-      password: formData.password,
-    }).unwrap();
+    try {
+      const res = await signUpUser({
+        avatar: formData.avatar,
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        address: formData.address,
+        password: formData.password,
+      }).unwrap();
 
-    dispatch(
-      setUser({
-        user: res?.data?.user,
-        accessToken: res?.data?.accessToken,
-      })
-    );
+      dispatch(
+        setUser({
+          user: res?.data?.user,
+          accessToken: res?.data?.accessToken,
+        }),
+      );
 
-    toast({
-      title: "Application Successful 🎉",
-      description: "Your membership account has been created.",
-    });
+      toast({
+        title: "Application Successful 🎉",
+        description: "Your membership account has been created.",
+      });
 
-    setSuccess(true);
-    setTimeout(() => router.push("/dashboard"), 2000);
-  } catch (err: any) {
-    toast({
-      variant: "destructive",
-      title: "Signup Failed",
-      description: err?.data?.message || "Something went wrong",
-    });
-  }
-};
-
+      setSuccess(true);
+      setTimeout(() => router.push("/dashboard"), 2000);
+    } catch (err: any) {
+      toast({
+        variant: "destructive",
+        title: "Signup Failed",
+        description: err?.data?.message || "Something went wrong",
+      });
+    }
+  };
 
   if (success) {
     return (

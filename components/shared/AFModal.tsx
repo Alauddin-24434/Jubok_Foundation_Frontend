@@ -27,15 +27,15 @@ export function AFModal({
 }: AFModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className={`${className} p-0 overflow-hidden rounded-2xl border-none shadow-2xl`}>
+      <DialogContent
+        className={`${className} p-0 overflow-hidden rounded-2xl border-none shadow-2xl`}
+      >
         <DialogHeader className="p-6 pb-0">
           <DialogTitle className="text-2xl font-bold text-foreground">
             {title}
           </DialogTitle>
         </DialogHeader>
-        <div className="p-6 pt-4">
-          {children}
-        </div>
+        <div className="p-6 pt-4">{children}</div>
       </DialogContent>
     </Dialog>
   );

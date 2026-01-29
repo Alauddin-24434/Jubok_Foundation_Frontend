@@ -2,14 +2,32 @@ import baseApi from "../../baseApi";
 
 const managementApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getManagements: builder.query({
-      query: (params) => ({
-        url: "/management",
-        method: "GET",
-        params,
-      }),
-      providesTags: ["Management"],
-    }),
+getManagements: builder.query<
+  {
+    data: any[];
+    meta: {
+      total: number;
+      page: number;
+      limit: number;
+      totalPage: number;
+    };
+  },
+  {
+    page?: number;
+    limit?: number;
+    search?: string;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+  }
+>({
+  query: (params) => ({
+    url: "/management",
+    method: "GET",
+    params,
+  }),
+  providesTags: ["Management"],
+}),
+
     getManagementById: builder.query({
       query: (id) => ({
         url: `/management/${id}`,

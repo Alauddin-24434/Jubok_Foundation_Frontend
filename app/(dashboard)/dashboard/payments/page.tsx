@@ -29,7 +29,16 @@ import { VerifyPaymentModal } from "@/components/verifyPaymentModel";
 import { AFPageHeader } from "@/components/shared/AFPageHeader";
 import { AFSearchFilters } from "@/components/shared/AFSearchFilters";
 import { AFDataTable } from "@/components/shared/AFDataTable";
-import { ChevronLeft, ChevronRight, Hash, Phone, User as UserIcon, Calendar, CheckCircle, Clock } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Hash,
+  Phone,
+  User as UserIcon,
+  Calendar,
+  CheckCircle,
+  Clock,
+} from "lucide-react";
 
 /**
  * Filter configuration for payment lifecycle stages.
@@ -62,18 +71,24 @@ export default function AdminPaymentsPage() {
     sortOrder: "desc",
   });
 
-  const [approvePayment, { isLoading: approving }] = useApprovePaymentMutation();
+  const [approvePayment, { isLoading: approving }] =
+    useApprovePaymentMutation();
 
   //======================   EVENT HANDLERS   ===============================
   const handleApprove = async () => {
     const toastId = toast.loading("Executing payment settlement protocol...");
     try {
       await approvePayment(selectedPayment._id).unwrap();
-      toast.success("Transaction verified and settled successfully ✅", { id: toastId });
+      toast.success("Transaction verified and settled successfully ✅", {
+        id: toastId,
+      });
       setOpenConfirm(false);
       setOpenVerify(false);
     } catch (err: any) {
-      toast.error(err?.data?.message || "Protocol Violation: Approval sequence failed ❌", { id: toastId });
+      toast.error(
+        err?.data?.message || "Protocol Violation: Approval sequence failed ❌",
+        { id: toastId },
+      );
     }
   };
 
@@ -92,20 +107,24 @@ export default function AdminPaymentsPage() {
             <UserIcon size={16} />
           </div>
           <div className="flex flex-col">
-            <span className="font-bold text-foreground tracking-tight text-sm">{payment.userId?.name}</span>
-            <span className="text-[10px] text-muted-foreground font-medium italic">{payment.userId?.email}</span>
+            <span className="font-bold text-foreground tracking-tight text-sm">
+              {payment.userId?.name}
+            </span>
+            <span className="text-[10px] text-muted-foreground font-medium italic">
+              {payment.userId?.email}
+            </span>
           </div>
         </div>
       ),
     },
-    { 
-      header: "Contact Hook", 
+    {
+      header: "Contact Hook",
       cell: (payment: any) => (
         <div className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground">
           <Phone size={12} className="text-primary/60" />
           {payment.senderNumber}
         </div>
-      )
+      ),
     },
     {
       header: "Net Amount",
@@ -124,12 +143,16 @@ export default function AdminPaymentsPage() {
             payment.status === "PAID"
               ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20 shadow-none"
               : payment.status === "PENDING"
-              ? "bg-amber-500/10 text-amber-600 border-amber-500/20 shadow-none"
-              : "bg-red-500/10 text-red-600 border-red-500/20 shadow-none"
+                ? "bg-amber-500/10 text-amber-600 border-amber-500/20 shadow-none"
+                : "bg-red-500/10 text-red-600 border-red-500/20 shadow-none"
           }`}
           variant="outline"
         >
-          {payment.status === "PAID" ? <CheckCircle size={10} className="mr-1" /> : <Clock size={10} className="mr-1" />}
+          {payment.status === "PAID" ? (
+            <CheckCircle size={10} className="mr-1" />
+          ) : (
+            <Clock size={10} className="mr-1" />
+          )}
           {payment.status}
         </Badge>
       ),
@@ -206,14 +229,18 @@ export default function AdminPaymentsPage() {
       {data && data.meta && data.meta.totalPages > 1 && (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 py-8 bg-muted/10 rounded-2xl">
           <div className="text-xs font-black uppercase tracking-widest text-muted-foreground">
-            Ledger Sector <span className="text-primary">{data.meta.page}</span> / {data.meta.totalPages}
+            Ledger Sector <span className="text-primary">{data.meta.page}</span>{" "}
+            / {data.meta.totalPages}
           </div>
           <div className="flex gap-3">
             <Button
               variant="outline"
               size="sm"
               disabled={page === 1}
-              onClick={() => {setPage((p) => p - 1); window.scrollTo({ top: 0, behavior: 'smooth' });}}
+              onClick={() => {
+                setPage((p) => p - 1);
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
               className="h-10 px-6 rounded-xl font-bold bg-background shadow-sm hover:shadow-md transition-all"
             >
               <ChevronLeft className="h-4 w-4 mr-2" />
@@ -223,7 +250,10 @@ export default function AdminPaymentsPage() {
               variant="outline"
               size="sm"
               disabled={page === data.meta.totalPages}
-              onClick={() => {setPage((p) => p + 1); window.scrollTo({ top: 0, behavior: 'smooth' });}}
+              onClick={() => {
+                setPage((p) => p + 1);
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
               className="h-10 px-6 rounded-xl font-bold bg-background shadow-sm hover:shadow-md transition-all"
             >
               Next Sector
@@ -245,21 +275,24 @@ export default function AdminPaymentsPage() {
       <AlertDialog open={openConfirm} onOpenChange={setOpenConfirm}>
         <AlertDialogContent className="rounded-3xl border-none shadow-3xl overflow-hidden p-0">
           <div className="bg-emerald-500/10 p-8 flex flex-col items-center gap-4 text-center">
-             <div className="h-16 w-16 bg-emerald-500 rounded-full flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
-                <CheckCircle size={32} />
-             </div>
-             <div className="space-y-1">
-                <AlertDialogTitle className="text-2xl font-black text-emerald-900 tracking-tight">
-                  Authorization Required
-                </AlertDialogTitle>
-                <AlertDialogDescription className="text-emerald-700/70 font-medium">
-                  Confirming this transaction will grant full system access to the contributor.
-                </AlertDialogDescription>
-             </div>
+            <div className="h-16 w-16 bg-emerald-500 rounded-full flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
+              <CheckCircle size={32} />
+            </div>
+            <div className="space-y-1">
+              <AlertDialogTitle className="text-2xl font-black text-emerald-900 tracking-tight">
+                Authorization Required
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-emerald-700/70 font-medium">
+                Confirming this transaction will grant full system access to the
+                contributor.
+              </AlertDialogDescription>
+            </div>
           </div>
 
           <div className="p-8 pt-4 flex flex-col sm:flex-row gap-3">
-            <AlertDialogCancel className="flex-1 rounded-2xl h-12 font-bold border-muted-foreground/20 hover:bg-muted">Discard Protocol</AlertDialogCancel>
+            <AlertDialogCancel className="flex-1 rounded-2xl h-12 font-bold border-muted-foreground/20 hover:bg-muted">
+              Discard Protocol
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleApprove}
               disabled={approving}
@@ -273,4 +306,3 @@ export default function AdminPaymentsPage() {
     </div>
   );
 }
-

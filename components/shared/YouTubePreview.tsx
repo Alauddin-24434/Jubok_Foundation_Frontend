@@ -1,21 +1,22 @@
-'use client'
+"use client";
 
-import { Card } from '@/components/ui/card'
+import { Card } from "@/components/ui/card";
 
 interface YouTubePreviewProps {
-  url: string
+  url: string;
 }
 
 export default function YouTubePreview({ url }: YouTubePreviewProps) {
   const getYouTubeId = (url: string) => {
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/
-    const match = url.match(regExp)
-    return (match && match[2].length === 11) ? match[2] : null
-  }
+    const regExp =
+      /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return match && match[2].length === 11 ? match[2] : null;
+  };
 
-  const videoId = getYouTubeId(url)
+  const videoId = getYouTubeId(url);
 
-  if (!videoId) return null
+  if (!videoId) return null;
 
   return (
     <Card className="mt-4 overflow-hidden aspect-video bg-muted flex items-center justify-center">
@@ -29,5 +30,5 @@ export default function YouTubePreview({ url }: YouTubePreviewProps) {
         allowFullScreen
       />
     </Card>
-  )
+  );
 }

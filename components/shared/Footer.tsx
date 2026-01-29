@@ -2,130 +2,168 @@
 
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
-import { Facebook, Twitter, Instagram, Mail, Phone, MapPin } from "lucide-react";
+import {
+  Facebook,
+  Twitter,
+  Instagram,
+  Mail,
+  Phone,
+  MapPin,
+} from "lucide-react";
 
 export default function Footer() {
   const { t } = useTranslation();
 
   return (
-    <footer className="bg-background border-t border-border pt-16 pb-8">
+    <footer className="bg-background border-t border-border pt-12 sm:pt-16 pb-6 sm:pb-8">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
-          {/* Brand & Description */}
-          <div className="space-y-4">
+        {/* TOP GRID */}
+        <div
+          className="
+            grid grid-cols-1
+            sm:grid-cols-2
+            lg:grid-cols-4
+            gap-10 lg:gap-12
+            mb-10 sm:mb-12
+          "
+        >
+          {/* Brand */}
+          <div className="space-y-4 text-center sm:text-left">
             <Link
               href="/"
-              className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
+              className="inline-block text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
             >
               {t("brand.name")}
             </Link>
-            <p className="text-foreground/60 leading-relaxed max-w-xs">
+
+            <p className="text-sm sm:text-base text-foreground/60 leading-relaxed max-w-xs mx-auto sm:mx-0">
               {t("contact.desc")}
             </p>
-            <div className="flex gap-4">
-              <a href="#" className="p-2 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground transition-all">
-                <Facebook size={18} />
-              </a>
-              <a href="#" className="p-2 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground transition-all">
-                <Twitter size={18} />
-              </a>
-              <a href="#" className="p-2 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground transition-all">
-                <Instagram size={18} />
-              </a>
+
+            <div className="flex justify-center sm:justify-start gap-3">
+              {[Facebook, Twitter, Instagram].map((Icon, i) => (
+                <a
+                  key={i}
+                  href="#"
+                  className="
+                    p-2 rounded-full
+                    bg-primary/10 text-primary
+                    hover:bg-primary hover:text-primary-foreground
+                    transition-all
+                  "
+                >
+                  <Icon size={18} />
+                </a>
+              ))}
             </div>
           </div>
 
           {/* Quick Links */}
-          <div>
-            <h4 className="text-lg font-semibold mb-6 uppercase tracking-wider text-primary">
+          <div className="text-center sm:text-left">
+            <h4 className="text-sm sm:text-lg font-semibold mb-4 sm:mb-6 uppercase tracking-wider text-primary">
               {t("footer.quickLinks")}
             </h4>
-            <ul className="space-y-4">
-              <li>
-                <Link href="/projects" className="text-foreground/60 hover:text-primary transition-colors">
-                  {t("footer.agriculture")}
-                </Link>
-              </li>
-              <li>
-                <Link href="/projects" className="text-foreground/60 hover:text-primary transition-colors">
-                  {t("footer.fishFarming")}
-                </Link>
-              </li>
-              <li>
-                <Link href="/projects" className="text-foreground/60 hover:text-primary transition-colors">
-                  {t("footer.realEstate")}
-                </Link>
-              </li>
-              <li>
-                <Link href="/projects" className="text-foreground/60 hover:text-primary transition-colors">
-                  {t("footer.allOpps")}
-                </Link>
-              </li>
+            <ul className="space-y-3 sm:space-y-4">
+              {[
+                "footer.agriculture",
+                "footer.fishFarming",
+                "footer.realEstate",
+                "footer.allOpps",
+              ].map((key) => (
+                <li key={key}>
+                  <Link
+                    href="/projects"
+                    className="text-sm sm:text-base text-foreground/60 hover:text-primary transition-colors"
+                  >
+                    {t(key)}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
           {/* Support */}
-          <div>
-            <h4 className="text-lg font-semibold mb-6 uppercase tracking-wider text-primary">
+          <div className="text-center sm:text-left">
+            <h4 className="text-sm sm:text-lg font-semibold mb-4 sm:mb-6 uppercase tracking-wider text-primary">
               {t("footer.support")}
             </h4>
-            <ul className="space-y-4">
+            <ul className="space-y-3 sm:space-y-4">
               <li>
-                <Link href="/about" className="text-foreground/60 hover:text-primary transition-colors">
+                <Link href="/about" className="footer-link">
                   {t("common.about")}
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-foreground/60 hover:text-primary transition-colors">
+                <Link href="/contact" className="footer-link">
                   {t("footer.howItWorks")}
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-foreground/60 hover:text-primary transition-colors">
+                <Link href="/contact" className="footer-link">
                   {t("footer.faqs")}
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-foreground/60 hover:text-primary transition-colors">
+                <Link href="/contact" className="footer-link">
                   {t("footer.supportCenter")}
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Contact Info */}
-          <div>
-            <h4 className="text-lg font-semibold mb-6 uppercase tracking-wider text-primary">
+          {/* Contact */}
+          <div className="text-center sm:text-left">
+            <h4 className="text-sm sm:text-lg font-semibold mb-4 sm:mb-6 uppercase tracking-wider text-primary">
               {t("common.contact")}
             </h4>
-            <ul className="space-y-4">
-              <li className="flex items-start gap-3">
-                <MapPin className="text-primary mt-1" size={20} />
-                <span className="text-foreground/60">{t("contact.addressValue")}</span>
+            <ul className="space-y-4 text-sm sm:text-base">
+              <li className="flex justify-center sm:justify-start gap-3">
+                <MapPin size={18} className="text-primary flex-shrink-0" />
+                <span className="text-foreground/60">
+                  {t("contact.addressValue")}
+                </span>
               </li>
-              <li className="flex items-center gap-3">
-                <Phone className="text-primary" size={20} />
+              <li className="flex justify-center sm:justify-start gap-3">
+                <Phone size={18} className="text-primary" />
                 <span className="text-foreground/60">+880 1234 567 890</span>
               </li>
-              <li className="flex items-center gap-3">
-                <Mail className="text-primary" size={20} />
-                <span className="text-foreground/60">support@alhamdulillah.com</span>
+              <li className="flex justify-center sm:justify-start gap-3">
+                <Mail size={18} className="text-primary" />
+                <span className="text-foreground/60">
+                  support@alhamdulillah.com
+                </span>
               </li>
             </ul>
           </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-foreground/50 text-sm">
+        {/* BOTTOM BAR */}
+        <div
+          className="
+            pt-6 sm:pt-8 border-t border-border
+            flex flex-col md:flex-row
+            items-center justify-between
+            gap-4
+          "
+        >
+          <p className="text-xs sm:text-sm text-foreground/50 text-center md:text-left">
             {t("brand.copyright")}
           </p>
-          <div className="flex gap-6 text-sm text-foreground/50">
-            <Link href="/privacy" className="hover:text-primary">{t("common.privacyPolicy")}</Link>
-            <Link href="/terms" className="hover:text-primary">{t("common.termsOfService")}</Link>
+
+          <div className="flex gap-4 sm:gap-6 text-xs sm:text-sm text-foreground/50">
+            <Link href="/privacy" className="hover:text-primary">
+              {t("common.privacyPolicy")}
+            </Link>
+            <Link href="/terms" className="hover:text-primary">
+              {t("common.termsOfService")}
+            </Link>
           </div>
         </div>
       </div>
     </footer>
   );
 }
+
+/* Optional utility */
+const footerLink =
+  "text-sm sm:text-base text-foreground/60 hover:text-primary transition-colors";

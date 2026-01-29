@@ -18,7 +18,10 @@ interface AddTransactionFormProps {
   adding: boolean;
 }
 
-export const AddTransactionForm = ({ onAdd, adding }: AddTransactionFormProps) => {
+export const AddTransactionForm = ({
+  onAdd,
+  adding,
+}: AddTransactionFormProps) => {
   const [txType, setTxType] = useState<"INCOME" | "EXPENSE">("INCOME");
   const [txAmount, setTxAmount] = useState("");
   const [txReason, setTxReason] = useState("");
@@ -41,7 +44,10 @@ export const AddTransactionForm = ({ onAdd, adding }: AddTransactionFormProps) =
     for (let i = 0; i < totalFiles; i++) {
       const formData = new FormData();
       formData.append("file", files[i]);
-      formData.append("upload_preset", process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!);
+      formData.append(
+        "upload_preset",
+        process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!,
+      );
 
       try {
         const res = await axios.post(
@@ -49,12 +55,16 @@ export const AddTransactionForm = ({ onAdd, adding }: AddTransactionFormProps) =
           formData,
           {
             onUploadProgress: (progressEvent) => {
-              const filePercent = Math.round((progressEvent.loaded * 100) / (progressEvent.total || 1));
+              const filePercent = Math.round(
+                (progressEvent.loaded * 100) / (progressEvent.total || 1),
+              );
               // মোট ফাইলের সাপেক্ষে গড় প্রগ্রেস ক্যালকুলেশন
-              const overallPercent = Math.round(((i * 100) + filePercent) / totalFiles);
+              const overallPercent = Math.round(
+                (i * 100 + filePercent) / totalFiles,
+              );
               setUploadProgress(overallPercent);
             },
-          }
+          },
         );
         if (res.data.secure_url) urls.push(res.data.secure_url);
       } catch (error) {
@@ -73,9 +83,10 @@ export const AddTransactionForm = ({ onAdd, adding }: AddTransactionFormProps) =
     }
 
     try {
-      const imageUrls = evidenceImages.length > 0 
-        ? await uploadToCloudinary(evidenceImages) 
-        : [];
+      const imageUrls =
+        evidenceImages.length > 0
+          ? await uploadToCloudinary(evidenceImages)
+          : [];
 
       await onAdd({
         type: txType,
@@ -85,7 +96,7 @@ export const AddTransactionForm = ({ onAdd, adding }: AddTransactionFormProps) =
       });
 
       toast.success("Transaction added successfully!");
-      
+
       // Reset Form
       setTxAmount("");
       setTxReason("");
@@ -101,10 +112,11 @@ export const AddTransactionForm = ({ onAdd, adding }: AddTransactionFormProps) =
     <>
       <Card className="border-2 border-emerald-100 shadow-md">
         <CardHeader className="bg-emerald-50/50">
-          <CardTitle className="text-lg text-emerald-700">Add Fund Transaction</CardTitle>
+          <CardTitle className="text-lg text-emerald-700">
+            Add Fund Transaction
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6 pt-6">
-          
           {/* ইমেজ সেকশন */}
           <div className="space-y-3 p-4 border rounded-lg bg-gray-50/50">
             <div className="flex items-center justify-between">
@@ -118,26 +130,29 @@ export const AddTransactionForm = ({ onAdd, adding }: AddTransactionFormProps) =
                 </span>
               )}
             </div>
-            
-            <input 
-              type="file" 
-              multiple 
-              accept="image/*" 
+
+            <input
+              type="file"
+              multiple
+              accept="image/*"
               disabled={isUploading || adding}
               onChange={(e) => {
                 if (e.target.files) {
-                  setEvidenceImages((prev) => [...prev, ...Array.from(e.target.files!)]);
+                  setEvidenceImages((prev) => [
+                    ...prev,
+                    ...Array.from(e.target.files!),
+                  ]);
                   e.target.value = "";
                 }
-              }} 
-              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer disabled:opacity-50" 
+              }}
+              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer disabled:opacity-50"
             />
 
             {/* আপলোড প্রগ্রেস বার */}
             {isUploading && (
               <div className="w-full bg-gray-200 rounded-full h-1.5 mt-2">
-                <div 
-                  className="bg-emerald-500 h-1.5 rounded-full transition-all duration-300" 
+                <div
+                  className="bg-emerald-500 h-1.5 rounded-full transition-all duration-300"
                   style={{ width: `${uploadProgress}%` }}
                 ></div>
               </div>
@@ -147,10 +162,13 @@ export const AddTransactionForm = ({ onAdd, adding }: AddTransactionFormProps) =
             {evidenceImages.length > 0 && (
               <div className="flex flex-wrap gap-3 mt-4">
                 {evidenceImages.map((file, index) => (
-                  <div key={index} className="relative w-20 h-20 border rounded-lg overflow-hidden bg-white shadow-sm group">
-                    <img 
-                      src={URL.createObjectURL(file)} 
-                      alt="preview" 
+                  <div
+                    key={index}
+                    className="relative w-20 h-20 border rounded-lg overflow-hidden bg-white shadow-sm group"
+                  >
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt="preview"
                       className="w-full h-full object-cover"
                     />
                     <button
@@ -167,34 +185,34 @@ export const AddTransactionForm = ({ onAdd, adding }: AddTransactionFormProps) =
 
           {/* ইনপুট গ্রিড */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <select 
-              value={txType} 
+            <select
+              value={txType}
               disabled={isUploading || adding}
-              onChange={(e) => setTxType(e.target.value as any)} 
+              onChange={(e) => setTxType(e.target.value as any)}
               className="border rounded-md px-3 h-10 bg-white disabled:bg-gray-100"
             >
               <option value="INCOME">INCOME</option>
               <option value="EXPENSE">EXPENSE</option>
             </select>
 
-            <Input 
-              type="number" 
-              placeholder="Amount" 
-              value={txAmount} 
+            <Input
+              type="number"
+              placeholder="Amount"
+              value={txAmount}
               disabled={isUploading || adding}
-              onChange={(e) => setTxAmount(e.target.value)} 
+              onChange={(e) => setTxAmount(e.target.value)}
             />
 
-            <Input 
-              placeholder="Reason" 
-              value={txReason} 
+            <Input
+              placeholder="Reason"
+              value={txReason}
               disabled={isUploading || adding}
-              onChange={(e) => setTxReason(e.target.value)} 
+              onChange={(e) => setTxReason(e.target.value)}
             />
 
-            <Button 
-              onClick={handleSubmit} 
-              disabled={adding || isUploading} 
+            <Button
+              onClick={handleSubmit}
+              disabled={adding || isUploading}
               className="bg-emerald-600 hover:bg-emerald-800 text-white font-bold h-10"
             >
               {adding || isUploading ? (

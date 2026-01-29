@@ -29,10 +29,8 @@ export default function ProjectForm({
 }: ProjectFormProps) {
   const router = useRouter();
 
-  const [createProject, { isLoading: isCreating }] =
-    useCreateProjectMutation();
-  const [updateProject, { isLoading: isUpdating }] =
-    useUpdateProjectMutation();
+  const [createProject, { isLoading: isCreating }] = useCreateProjectMutation();
+  const [updateProject, { isLoading: isUpdating }] = useUpdateProjectMutation();
 
   const [formData, setFormData] = useState({
     name: initialData?.name || "",
@@ -268,9 +266,7 @@ export default function ProjectForm({
             onUploadSuccess={(url) =>
               setFormData({ ...formData, thumbnail: url })
             }
-            onRemove={() =>
-              setFormData({ ...formData, thumbnail: "" })
-            }
+            onRemove={() => setFormData({ ...formData, thumbnail: "" })}
           />
         </div>
       </Card>
@@ -282,7 +278,12 @@ export default function ProjectForm({
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <label className="text-sm font-medium">YouTube Videos</label>
-            <Button type="button" variant="outline" size="sm" onClick={addVideoUrl}>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={addVideoUrl}
+            >
               <Plus className="h-4 w-4 mr-2" /> Add
             </Button>
           </div>

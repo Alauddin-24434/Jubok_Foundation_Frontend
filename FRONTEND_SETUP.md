@@ -81,6 +81,7 @@ lib/
 ## Key Features Implemented
 
 ### 1. Landing Page
+
 - Modern hero section with clear value proposition
 - Feature cards highlighting platform benefits
 - How-it-works section with step-by-step guide
@@ -88,12 +89,14 @@ lib/
 - Professional navigation bar
 
 ### 2. Authentication
+
 - **Signup Page**: Collect user details (first/last name, email, phone, password)
 - **Login Page**: Email and password authentication
 - JWT token storage in localStorage
 - Session management with API routes
 
 ### 3. User Dashboard
+
 - **Overview**: Key statistics and recent projects
 - **Projects**: Browse and manage investment projects
 - **Members**: Manage join requests and memberships
@@ -101,6 +104,7 @@ lib/
 - **Settings**: Update profile, change password, notification preferences
 
 ### 4. Project Management
+
 - Project listing with search and filters
 - Detailed project pages with:
   - Funding progress tracking
@@ -110,11 +114,12 @@ lib/
 - Project creation interface (UI ready for backend integration)
 
 ### 5. Admin Panel
+
 - **Dashboard**: System statistics and analytics
   - Charts for funding trends
   - Project distribution
   - Recent user activity
-- **Users Management**: 
+- **Users Management**:
   - User listing with roles and status
   - Role assignment
   - User suspension/deletion
@@ -129,6 +134,7 @@ lib/
   - Database backup settings
 
 ### 6. Design System
+
 - **Color Scheme** (Trust-focused professional):
   - Primary: Deep Teal (#0ea5e9)
   - Secondary: Light Slate Blue (#06b6d4)
@@ -148,11 +154,14 @@ Replace mock API calls with actual backend endpoints. Update `/app/api/auth/` ro
 
 ```typescript
 // Example: Connecting to your NestJS backend
-const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ email, password }),
-})
+const response = await fetch(
+  `${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`,
+  {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  },
+);
 ```
 
 ### Environment Variables
@@ -168,23 +177,27 @@ NEXT_PUBLIC_API_URL=http://localhost:3000  # Your backend API URL
 ## User Roles & Permissions
 
 ### Super Admin
+
 - Access to complete admin dashboard
 - System configuration
 - User and project management
 - Database backup controls
 
 ### Admin
+
 - Project management
 - User oversight
 - Payment processing
 - Member approvals
 
 ### Moderator
+
 - Join request approvals
 - Member position assignment
 - Project moderation
 
 ### User
+
 - View and join projects
 - Make investments
 - Manage profile
@@ -205,22 +218,28 @@ Example integration:
 
 ```typescript
 // /app/api/auth/login/route.ts
-const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ email, password }),
-})
+const response = await fetch(
+  `${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`,
+  {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  },
+);
 
-const data = await response.json()
+const data = await response.json();
 
 if (!response.ok) {
-  return NextResponse.json(data, { status: response.status })
+  return NextResponse.json(data, { status: response.status });
 }
 
-return NextResponse.json({
-  token: data.access_token,
-  user: data.user,
-}, { status: 200 })
+return NextResponse.json(
+  {
+    token: data.access_token,
+    user: data.user,
+  },
+  { status: 200 },
+);
 ```
 
 ---
@@ -238,23 +257,27 @@ The frontend implements a manual verification flow:
 ## Development Tips
 
 ### Running Tests
+
 ```bash
 npm run test
 ```
 
 ### Building for Production
+
 ```bash
 npm run build
 npm start
 ```
 
 ### Code Quality
+
 ```bash
 npm run lint
 npm run format
 ```
 
 ### Dashboard Navigation
+
 - User Dashboard: `/dashboard`
 - Projects: `/dashboard/projects`
 - Members: `/dashboard/members`
@@ -262,6 +285,7 @@ npm run format
 - Settings: `/dashboard/settings`
 
 ### Admin Navigation
+
 - Admin Panel: `/admin`
 - Users: `/admin/users`
 - Projects: `/admin/projects`
@@ -302,15 +326,18 @@ npm run format
 ## Troubleshooting
 
 ### CORS Issues
+
 - Ensure your backend has proper CORS configuration
 - Check API URL in environment variables
 
 ### Authentication Failing
+
 - Verify JWT token is stored correctly
 - Check backend authentication endpoint
 - Ensure credentials match backend expectations
 
 ### Styling Issues
+
 - Clear `.next` folder and rebuild
 - Check Tailwind CSS configuration in `globals.css`
 
@@ -334,6 +361,7 @@ npm run format
 ## Support
 
 For issues or questions:
+
 1. Check existing GitHub issues
 2. Create detailed issue reports
 3. Contact: support@alhamdulillah.com

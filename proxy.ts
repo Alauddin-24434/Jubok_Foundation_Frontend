@@ -28,7 +28,7 @@ export async function proxy(request: NextRequest) {
 
   // 1. Allow static assets and internal requests
   if (
-    pathname.startsWith("/_next") || 
+    pathname.startsWith("/_next") ||
     pathname.startsWith("/api") ||
     pathname.includes(".") ||
     PUBLIC_ROUTES.includes(pathname)
@@ -37,10 +37,12 @@ export async function proxy(request: NextRequest) {
   }
 
   // 2. Handle Authentication Routes (Login/Register)
-  if (AUTH_ROUTES.some(route => pathname.startsWith(route))) {
+  if (AUTH_ROUTES.some((route) => pathname.startsWith(route))) {
     if (refreshToken) {
       try {
-        const secret = new TextEncoder().encode(process.env.NEXT_PUBLIC_REFRESH_TOKEN_SECRET!);
+        const secret = new TextEncoder().encode(
+          process.env.NEXT_PUBLIC_REFRESH_TOKEN_SECRET!,
+        );
         await jwtVerify(refreshToken, secret);
         return NextResponse.redirect(new URL("/dashboard", request.url));
       } catch (e) {
@@ -59,7 +61,9 @@ export async function proxy(request: NextRequest) {
     }
 
     try {
-      const secret = new TextEncoder().encode(process.env.NEXT_PUBLIC_REFRESH_TOKEN_SECRET!);
+      const secret = new TextEncoder().encode(
+        process.env.NEXT_PUBLIC_REFRESH_TOKEN_SECRET!,
+      );
       const { payload } = await jwtVerify(refreshToken, secret);
       const userRole = payload.role as string;
 

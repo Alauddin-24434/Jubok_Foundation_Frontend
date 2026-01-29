@@ -66,8 +66,8 @@ export function AFDataTable<T extends { _id?: string; id?: string }>({
                       {column.cell
                         ? column.cell(item)
                         : column.accessorKey
-                        ? (item[column.accessorKey] as ReactNode)
-                        : null}
+                          ? (item[column.accessorKey] as ReactNode)
+                          : null}
                     </TableCell>
                   ))}
                 </TableRow>

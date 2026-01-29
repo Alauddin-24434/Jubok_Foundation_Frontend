@@ -43,18 +43,28 @@ interface ManagementFormProps {
   onSuccess: () => void;
 }
 
-export function ManagementForm({ initialData, onSuccess }: ManagementFormProps) {
+export function ManagementForm({
+  initialData,
+  onSuccess,
+}: ManagementFormProps) {
   const { data: users } = useGetUsersQuery({});
-  const [createManagement, { isLoading: isCreating }] = useCreateManagementMutation();
-  const [updateManagement, { isLoading: isUpdating }] = useUpdateManagementMutation();
+  const [createManagement, { isLoading: isCreating }] =
+    useCreateManagementMutation();
+  const [updateManagement, { isLoading: isUpdating }] =
+    useUpdateManagementMutation();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       userId: initialData?.userId?._id || "",
       position: initialData?.position || "",
-      startAt: initialData?.startAt ? new Date(initialData.startAt).toISOString().split("T")[0] : "",
-      endAt: initialData?.endAt ? new Date(initialData.endAt).toISOString().split("T")[0] : "",
+      startAt: initialData?.startAt
+        ? new Date(initialData.startAt).toISOString().split("T")[0]
+        : "",
+      endAt: initialData?.endAt
+        ? new Date(initialData.endAt).toISOString().split("T")[0]
+        : undefined,
+
       isActive: initialData ? initialData.isActive : true,
     },
   });
@@ -138,7 +148,14 @@ export function ManagementForm({ initialData, onSuccess }: ManagementFormProps) 
               <FormItem>
                 <FormLabel>End Date (Optional)</FormLabel>
                 <FormControl>
-                  <Input type="date" {...field} value={field.value || ""} />
+                  <Input
+                    type="date"
+                    {...field}
+                    value={field.value || ""}
+                    onChange={(e) =>
+                      field.onChange(e.target.value || undefined)
+                    }
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -164,8 +181,14 @@ export function ManagementForm({ initialData, onSuccess }: ManagementFormProps) 
           )}
         />
 
-        <Button type="submit" className="w-full" disabled={isCreating || isUpdating}>
-          {(isCreating || isUpdating) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={isCreating || isUpdating}
+        >
+          {(isCreating || isUpdating) && (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          )}
           {initialData ? "Update Management" : "Create Management"}
         </Button>
       </form>

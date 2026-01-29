@@ -9,7 +9,6 @@ export const fundApi = baseApi.injectEndpoints({
         type: "INCOME" | "EXPENSE";
         amount: number;
         reason: string;
-
       }
     >({
       query: (data) => ({
@@ -42,5 +41,8 @@ export const fundApi = baseApi.injectEndpoints({
   }),
 });
 
-
-export const { useGetFundSummaryQuery, useGetFundHistoryQuery, useAddFundTransactionMutation } = fundApi;
+export const {
+  useGetFundSummaryQuery,
+  useGetFundHistoryQuery,
+  useAddFundTransactionMutation,
+} = fundApi;

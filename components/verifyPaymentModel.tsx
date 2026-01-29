@@ -3,8 +3,8 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 type Props = {
   open: boolean;
@@ -31,11 +31,21 @@ export function VerifyPaymentModal({
         </DialogHeader>
 
         <div className="space-y-2 text-sm">
-          <p><b>Name:</b> {payment.userId?.name}</p>
-          <p><b>Email:</b> {payment.userId?.email}</p>
-          <p><b>Phone:</b> {payment.senderNumber}</p>
-          <p><b>Transaction ID:</b> {payment.transactionId}</p>
-          <p><b>Amount:</b> ৳ {payment.amount}</p>
+          <p>
+            <b>Name:</b> {payment.userId?.name}
+          </p>
+          <p>
+            <b>Email:</b> {payment.userId?.email}
+          </p>
+          <p>
+            <b>Phone:</b> {payment.senderNumber}
+          </p>
+          <p>
+            <b>Transaction ID:</b> {payment.transactionId}
+          </p>
+          <p>
+            <b>Amount:</b> ৳ {payment.amount}
+          </p>
 
           {payment.screenshot && (
             <img
@@ -52,7 +62,7 @@ export function VerifyPaymentModal({
           </Button>
 
           <Button onClick={onConfirm} disabled={loading}>
-            {loading ? 'Approving...' : 'Approve'}
+            {loading ? "Approving..." : "Approve"}
           </Button>
         </div>
       </DialogContent>

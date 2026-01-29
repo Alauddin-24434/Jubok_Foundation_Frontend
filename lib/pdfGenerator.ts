@@ -1,7 +1,12 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
-export const generateFundPDF = (history: any[], summary: any, sigName: string, sigDesignation: string) => {
+export const generateFundPDF = (
+  history: any[],
+  summary: any,
+  sigName: string,
+  sigDesignation: string,
+) => {
   if (!history) return;
 
   const pdf = new jsPDF("p", "mm", "a4") as any;
@@ -14,7 +19,9 @@ export const generateFundPDF = (history: any[], summary: any, sigName: string, s
   pdf.setGState(new (pdf as any).GState({ opacity: 0.03 }));
   for (let x = 10; x < pageWidth; x += 40) {
     for (let y = 10; y < pageHeight; y += 40) {
-      try { pdf.addImage("/images/SEAL.png", "PNG", x, y, 15, 15); } catch (e) {}
+      try {
+        pdf.addImage("/images/SEAL.png", "PNG", x, y, 15, 15);
+      } catch (e) {}
     }
   }
   pdf.restoreGraphicsState();
@@ -25,7 +32,10 @@ export const generateFundPDF = (history: any[], summary: any, sigName: string, s
   pdf.setFontSize(40);
   pdf.setFont(undefined, "bold");
   pdf.setTextColor(100);
-  pdf.text("ALHAMDULILLAH FOUNDATION", pageWidth / 2, pageHeight / 2, { align: "center", angle: 45 });
+  pdf.text("ALHAMDULILLAH FOUNDATION", pageWidth / 2, pageHeight / 2, {
+    align: "center",
+    angle: 45,
+  });
   pdf.restoreGraphicsState();
 
   // ৩. হেডার
@@ -35,8 +45,10 @@ export const generateFundPDF = (history: any[], summary: any, sigName: string, s
 
   const oneMonthAgo = new Date();
   oneMonthAgo.setMonth(now.getMonth() - 1);
-  
-  const lastMonthTx = history.filter(tx => new Date(tx.createdAt) >= oneMonthAgo);
+
+  const lastMonthTx = history.filter(
+    (tx) => new Date(tx.createdAt) >= oneMonthAgo,
+  );
   const tableRows = lastMonthTx.map((tx) => [
     new Date(tx.createdAt).toLocaleDateString(),
     tx.createdBy?.name || "N/A",
@@ -58,15 +70,30 @@ export const generateFundPDF = (history: any[], summary: any, sigName: string, s
   const finalTableY = (pdf as any).lastAutoTable.finalY + 10;
   pdf.setFont(undefined, "bold");
   pdf.setTextColor(0);
-  pdf.text(`Total Current Balance: ${(summary?.currentBalance || 0).toLocaleString()} BDT`, pageWidth - 14, finalTableY, { align: "right" });
+  pdf.text(
+    `Total Current Balance: ${(summary?.currentBalance || 0).toLocaleString()} BDT`,
+    pageWidth - 14,
+    finalTableY,
+    { align: "right" },
+  );
 
   // ৪. সিগনেচার ও সিল
   const footerY = pageHeight - 45;
   try {
-    pdf.addImage("/images/SEAL.png", "PNG", pageWidth - 60, footerY - 20, 45, 45);
+    pdf.addImage(
+      "/images/SEAL.png",
+      "PNG",
+      pageWidth - 60,
+      footerY - 20,
+      45,
+      45,
+    );
     pdf.setTextColor(39, 174, 96);
     pdf.setFontSize(16);
-    pdf.text("VERIFIED", pageWidth - 38, footerY + 2, { align: "center", angle: -15 });
+    pdf.text("VERIFIED", pageWidth - 38, footerY + 2, {
+      align: "center",
+      angle: -15,
+    });
   } catch (e) {}
 
   pdf.setTextColor(0, 0, 150);
