@@ -37,20 +37,25 @@ export async function proxy(request: NextRequest) {
   }
 
   // 2. Handle Authentication Routes (Login/Register)
-  if (AUTH_ROUTES.some((route) => pathname.startsWith(route))) {
-    if (refreshToken) {
-      try {
-        const secret = new TextEncoder().encode(
-          process.env.NEXT_PUBLIC_REFRESH_TOKEN_SECRET!,
-        );
-        await jwtVerify(refreshToken, secret);
-        return NextResponse.redirect(new URL("/dashboard", request.url));
-      } catch (e) {
-        return NextResponse.next();
-      }
+ if (AUTH_ROUTES.some((route) => pathname.startsWith(route))) {
+  // Only redirect if cookie exists AND is valid
+  if (refreshToken) {
+    try {
+      const secret = new TextEncoder().encode(
+        process.env.NEXT_PUBLIC_REFRESH_TOKEN_SECRET!,
+      );
+      await jwtVerify(refreshToken, secret);
+      // ✅ Only redirect if token is valid
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    } catch (e) {
+      // Token invalid -> allow login page
+      return NextResponse.next();
     }
-    return NextResponse.next();
   }
+  // No cookie -> allow login page
+  return NextResponse.next();
+}
+
 
   // 3. Handle Private Dashboard Routes
   if (pathname.startsWith("/dashboard")) {

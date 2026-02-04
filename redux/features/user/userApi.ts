@@ -25,7 +25,7 @@ const userApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: ["User"],
+      invalidatesTags: ["User", "Auth"],
     }),
     deleteUser: builder.mutation({
       query: (id) => ({

@@ -9,7 +9,6 @@ import HeroSection from "@/components/shared/home/HeroSection";
 import ContactUsSection from "@/components/shared/home/ContactUsSection";
 import FaqSection from "@/components/shared/home/FaqSection";
 import ProjectsSection from "@/components/shared/home/ProjectSection";
-import AboutUsSection from "@/components/shared/home/AboutUseSection";
 
 export default function LandingPage() {
 
@@ -21,9 +20,7 @@ export default function LandingPage() {
       {/* PROJECTS */}
       <ProjectsSection />
 
-      {/* ABOUT US */}
-      <AboutUsSection/>
-
+    
       {/* TEAM */}
       <CommeeteeSection />
 

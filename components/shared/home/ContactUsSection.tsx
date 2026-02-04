@@ -21,22 +21,24 @@ export default function ContactUsSection() {
 
     setIsSending(true);
 
-    emailjs.sendForm(
-      "service_xxxxxx",
-      "template_xxxxxx",
-      formRef.current,
-      "your_public_key",
-    ).then(
-      () => {
-        toast.success(t("contact.success"));
-        formRef.current?.reset();
-        setIsSending(false);
-      },
-      () => {
-        toast.error(t("contact.error"));
-        setIsSending(false);
-      }
-    );
+    emailjs
+      .sendForm(
+        process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
+        process.env.NEXT_PUBLIC_EAMILJS_TEMPLATE_ID!,
+        formRef.current,
+        process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY!,
+      )
+      .then(
+        () => {
+          toast.success(t("contact.success"));
+          formRef.current?.reset();
+          setIsSending(false);
+        },
+        () => {
+          toast.error(t("contact.error"));
+          setIsSending(false);
+        },
+      );
   };
 
   return (
@@ -59,8 +61,10 @@ export default function ContactUsSection() {
         {/* Content */}
         <div className="grid gap-10 md:grid-cols-2 items-start">
           {/* Form */}
-          <Card className="p-6 sm:p-8 bg-background/60 backdrop-blur
-            border-border shadow-xl">
+          <Card
+            className="p-6 sm:p-8 bg-background/60 backdrop-blur
+            border-border shadow-xl"
+          >
             <form ref={formRef} onSubmit={sendEmail} className="space-y-5">
               <div className="space-y-1.5">
                 <label className="text-sm font-medium">
@@ -110,8 +114,10 @@ export default function ContactUsSection() {
             </form>
 
             {/* Contact Info */}
-            <div className="mt-10 pt-8 border-t border-border
-              grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
+            <div
+              className="mt-10 pt-8 border-t border-border
+              grid grid-cols-1 sm:grid-cols-3 gap-6 text-center"
+            >
               <InfoItem
                 icon={<MapPin size={18} />}
                 label={t("contact.addressLabel")}
@@ -131,10 +137,12 @@ export default function ContactUsSection() {
           </Card>
 
           {/* Map */}
-          <div className="
+          <div
+            className="
             rounded-2xl overflow-hidden shadow-2xl border border-border
             h-[300px] sm:h-[400px] md:h-full md:min-h-[520px]
-          ">
+          "
+          >
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d116833.95338883515!2d90.3372879857908!3d23.780620666016733"
               width="100%"
@@ -162,8 +170,10 @@ function InfoItem({
 }) {
   return (
     <div>
-      <div className="h-9 w-9 rounded-lg bg-primary/10
-        flex items-center justify-center text-primary mx-auto mb-2">
+      <div
+        className="h-9 w-9 rounded-lg bg-primary/10
+        flex items-center justify-center text-primary mx-auto mb-2"
+      >
         {icon}
       </div>
       <p className="text-xs font-bold uppercase">{label}</p>

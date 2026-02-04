@@ -1,71 +1,103 @@
 "use client";
+
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Link, Users } from "lucide-react";
-import { useTranslation } from "react-i18next"
+import { ArrowRight, Users } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function AboutUsSection() {
-    const { t } = useTranslation();
-    return (
-        <section
-        id="about"
-        className="container mx-auto py-12 px-4 md:px-8 md:py-24 border-t border-border/50"
-      >
-        <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-center">
-          <div className="space-y-4 md:space-y-6">
-            <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold leading-tight">
+  const { t } = useTranslation();
+
+  return (
+    <section id="about" className="w-full border-t border-border/50">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-24">
+        <div className="grid gap-10 md:grid-cols-2 md:gap-16 items-center">
+          {/* ================= LEFT CONTENT ================= */}
+          <div className="space-y-5 sm:space-y-6">
+            <h2 className="font-bold leading-tight text-2xl sm:text-3xl md:text-4xl lg:text-5xl">
               {t("about.title")}
             </h2>
-            <p className="text-sm sm:text-base md:text-lg text-foreground/70 leading-relaxed">
+
+            <p className="text-foreground/70 text-sm sm:text-base md:text-lg leading-relaxed">
               {t("about.desc")}
             </p>
-            <div className="grid grid-cols-2 gap-3 md:gap-6 pt-2 md:pt-4">
-              <div className="p-3 md:p-4 rounded-xl bg-primary/5 border border-primary/10">
-                <div className="h-8 w-8 md:h-10 md:w-10 rounded-lg bg-primary/20 flex items-center justify-center mb-2 md:mb-3">
-                  <Users className="text-primary w-4 h-4 md:w-5 md:h-5" />
+
+            {/* STATS */}
+            <div className="grid grid-cols-2 gap-4 sm:gap-6 pt-2">
+              <div className="rounded-xl p-4 bg-primary/5 border border-primary/10">
+                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/20">
+                  <Users className="h-5 w-5 text-primary" />
                 </div>
-                <h4 className="font-bold text-sm md:text-base mb-1">
+                <h4 className="font-semibold text-sm sm:text-base">
                   {t("about.membersCount")}
                 </h4>
-                <p className="text-xs text-foreground/60">
+                <p className="text-xs sm:text-sm text-foreground/60">
                   {t("about.membersDesc")}
                 </p>
               </div>
-              <div className="p-3 md:p-4 rounded-xl bg-secondary/5 border border-secondary/10">
-                <div className="h-8 w-8 md:h-10 md:w-10 rounded-lg bg-secondary/20 flex items-center justify-center mb-2 md:mb-3">
-                  <ArrowRight className="text-secondary rotate-[-45deg] w-4 h-4 md:w-5 md:h-5" />
+
+              <div className="rounded-xl p-4 bg-secondary/5 border border-secondary/10">
+                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-secondary/20">
+                  <ArrowRight className="h-5 w-5 text-secondary -rotate-45" />
                 </div>
-                <h4 className="font-bold text-sm md:text-base mb-1">
+                <h4 className="font-semibold text-sm sm:text-base">
                   {t("about.projectsCount")}
                 </h4>
-                <p className="text-xs text-foreground/60">
+                <p className="text-xs sm:text-sm text-foreground/60">
                   {t("about.projectsDesc")}
                 </p>
               </div>
             </div>
-            <Link href="/about" className="inline-block mt-2 md:mt-4">
+
+            {/* LINK */}
+            <Link href="/about">
               <Button
                 variant="link"
-                className="p-0 text-primary h-auto text-base md:text-lg gap-2"
+                className="px-0 text-primary text-base sm:text-lg gap-2"
               >
-                {t("about.visionLink")}{" "}
-                <ArrowRight size={16} className="md:w-[18px]" />
+                {t("about.visionLink")}
+                <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
           </div>
-          <div className="relative">
+
+          {/* ================= RIGHT IMAGE ================= */}
+          <div className="relative mx-auto w-full max-w-sm sm:max-w-md md:max-w-none">
             <div className="aspect-square rounded-3xl overflow-hidden bg-gradient-to-tr from-primary/20 to-secondary/20 border border-border flex items-center justify-center">
-              <div className="text-9xl grayscale opacity-20">🌾🐟🏢</div>
+              <div className="text-7xl sm:text-8xl md:text-9xl opacity-20 grayscale">
+                🌾🐟🏢
+              </div>
             </div>
-            <div className="absolute -bottom-6 -left-6 p-8 bg-background rounded-2xl shadow-2xl border border-border max-w-[200px]">
-              <p className="text-3xl font-bold text-primary">
+
+            {/* FLOATING CARD */}
+            {/* FLOATING CARD */}
+            <div
+              className="
+    absolute
+    bottom-4 left-1/2
+    -translate-x-1/2
+
+    sm:bottom-6 sm:left-6 sm:translate-x-0
+    md:bottom-8 md:left-8
+
+    max-w-[160px] sm:max-w-[190px] md:max-w-[220px]
+    rounded-2xl
+    border border-border
+    bg-background
+    p-4 sm:p-5
+    shadow-xl
+  "
+            >
+              <p className="text-xl sm:text-2xl md:text-3xl font-bold text-primary">
                 {t("about.transparency")}
               </p>
-              <p className="text-sm text-foreground/60">
+              <p className="text-xs sm:text-sm text-foreground/60">
                 {t("about.transparencyDesc")}
               </p>
             </div>
           </div>
         </div>
-      </section>
-    )
+      </div>
+    </section>
+  );
 }

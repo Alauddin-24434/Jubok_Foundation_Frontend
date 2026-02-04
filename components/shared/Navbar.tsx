@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Menu, Sun, Moon, Languages } from "lucide-react";
+import { Menu, Sun, Moon, Languages, LanguagesIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
@@ -40,6 +40,13 @@ export default function Navbar() {
     i18n.changeLanguage(lang);
     localStorage.setItem("lang", lang);
   };
+
+const handleLogout = async () => {
+  await fetch('http://localhost:5000/api/auth/logout', { method: 'POST', credentials: 'include' });
+  dispatch(logout());
+
+};
+
 
   return (
     <nav className="fixed top-0 z-50 w-full h-16 backdrop-blur-xl bg-background/80 border-b border-border">
@@ -99,7 +106,7 @@ export default function Navbar() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="icon">
-                <Languages size={16} />
+                <LanguagesIcon size={16} />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -122,7 +129,7 @@ export default function Navbar() {
               </Link>
 
               <Button
-                onClick={() => dispatch(logout())}
+                onClick={ handleLogout}
                 className="bg-primary text-primary-foreground"
               >
                 {t("common.logout")}

@@ -30,29 +30,42 @@ export function VerifyPaymentModal({
           <DialogTitle>Verify Payment</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-2 text-sm">
-          <p>
-            <b>Name:</b> {payment.userId?.name}
-          </p>
-          <p>
-            <b>Email:</b> {payment.userId?.email}
-          </p>
-          <p>
-            <b>Phone:</b> {payment.senderNumber}
-          </p>
-          <p>
-            <b>Transaction ID:</b> {payment.transactionId}
-          </p>
-          <p>
-            <b>Amount:</b> ৳ {payment.amount}
-          </p>
+        <div className="space-y-4 py-4">
+          <div className="grid grid-cols-2 gap-4 text-xs">
+            <div className="space-y-1">
+              <p className="text-muted-foreground font-black uppercase tracking-widest text-[10px]">Name</p>
+              <p className="font-bold">{payment.userId?.name || "Unknown"}</p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-muted-foreground font-black uppercase tracking-widest text-[10px]">Email</p>
+              <p className="font-bold truncate">{payment.userId?.email || "N/A"}</p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-muted-foreground font-black uppercase tracking-widest text-[10px]">Contact</p>
+              <p className="font-bold">{payment.senderNumber || payment.userId?.phone || "Gateway Verified"}</p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-muted-foreground font-black uppercase tracking-widest text-[10px]">Amount</p>
+              <p className="font-bold text-primary text-base">৳ {payment.amount}</p>
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <p className="text-muted-foreground font-black uppercase tracking-widest text-[10px]">Transaction ID</p>
+            <code className="block bg-muted p-2 rounded-lg font-mono text-[10px] break-all border border-muted-foreground/10">
+              {payment.transactionId}
+            </code>
+          </div>
 
           {payment.screenshot && (
-            <img
-              src={payment.screenshot}
-              alt="Payment Proof"
-              className="rounded border mt-2"
-            />
+            <div className="space-y-2">
+              <p className="text-muted-foreground font-black uppercase tracking-widest text-[10px]">Contribution Proof</p>
+              <img
+                src={payment.screenshot}
+                alt="Payment Proof"
+                className="rounded-2xl border-2 border-muted shadow-lg w-full object-cover"
+              />
+            </div>
           )}
         </div>
 

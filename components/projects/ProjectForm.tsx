@@ -44,7 +44,7 @@ export default function ProjectForm({
     endDate: initialData?.endDate
       ? new Date(initialData.endDate).toISOString().split("T")[0]
       : "",
-    intialInvestment: initialData?.intialInvestment || 0,
+    initialInvestment: initialData?.initialInvestment || 0,
     category: initialData?.category || "Agriculture",
     location: initialData?.location || "",
     contactNumber: initialData?.contactNumber || "",
@@ -79,7 +79,7 @@ export default function ProjectForm({
         videos: [""],
         startDate: "",
         endDate: "",
-        intialInvestment: 0,
+        initialInvestment: 0,
         category: "Agriculture",
         location: "",
         contactNumber: "",
@@ -94,8 +94,8 @@ export default function ProjectForm({
 
     const cleanedData = {
       ...formData,
-      intialInvestment: Number(formData.intialInvestment),
-      videos: formData.videos.filter((v) => v.trim()),
+      initialInvestment: Number(formData.initialInvestment),
+      videos: formData.videos.filter((v: string) => v.trim()),
       startDate: formData.startDate
         ? new Date(formData.startDate).toISOString()
         : undefined,
@@ -129,7 +129,7 @@ export default function ProjectForm({
   const removeVideoUrl = (i: number) =>
     setFormData({
       ...formData,
-      videos: formData.videos.filter((_, index) => index !== i),
+      videos: formData.videos.filter((_: string, index: number) => index !== i),
     });
 
   const updateVideoUrl = (i: number, v: string) => {
@@ -139,7 +139,7 @@ export default function ProjectForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8 max-w-4xl mx-auto pb-12">
+    <form onSubmit={handleSubmit} className="space-y-8 pb-12">
       {/* ================= BASIC INFO ================= */}
       <Card className="p-6 space-y-6">
         <h2 className="text-xl font-semibold">Basic Information</h2>
@@ -213,11 +213,11 @@ export default function ProjectForm({
             </label>
             <Input
               type="number"
-              value={formData.intialInvestment}
+              value={formData.initialInvestment}
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  intialInvestment: Number(e.target.value),
+                  initialInvestment: Number(e.target.value),
                 })
               }
               required
@@ -288,7 +288,7 @@ export default function ProjectForm({
             </Button>
           </div>
 
-          {formData.videos.map((url, i) => (
+          {formData.videos.map((url: string, i: number) => (
             <div key={i} className="space-y-2">
               <div className="flex gap-2">
                 <Input
@@ -327,18 +327,34 @@ export default function ProjectForm({
       </Card>
 
       {/* ================= ACTIONS ================= */}
-      <div className="flex justify-end gap-4">
+      <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4">
         {!isEditing && (
-          <Button variant="ghost" type="button" onClick={clearDraft}>
+          <Button
+            variant="ghost"
+            type="button"
+            onClick={clearDraft}
+            className="w-full sm:w-auto cursor-pointer"
+          >
             <RotateCcw className="h-4 w-4 mr-2" />
             Clear Draft
           </Button>
         )}
-        <Button variant="outline" type="button" onClick={() => router.back()}>
+
+        <Button
+          variant="outline"
+          type="button"
+          onClick={() => router.back()}
+          className="w-full sm:w-auto cursor-pointer"
+        >
           Cancel
         </Button>
-        <Button type="submit" disabled={isCreating || isUpdating}>
-          {isEditing ? "Update Project" : "Create Project"}
+
+        <Button
+          type="submit"
+          disabled={isCreating || isUpdating}
+          className="w-full sm:w-auto cursor-pointer"
+        >
+          {isEditing ? "Update Project" : "Submit Project"}
         </Button>
       </div>
     </form>

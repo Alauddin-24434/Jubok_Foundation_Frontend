@@ -1,6 +1,7 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "./coomnSiedbar";
 import Navbar from "@/components/shared/Navbar";
+import Footer from "@/components/shared/Footer";
 
 export default function Layout({
   children,
@@ -19,6 +20,7 @@ export default function Layout({
         <main >
           {children}
         </main>
+        <Footer/>
       </div>
     </SidebarProvider>
   );

@@ -33,10 +33,10 @@ export const TransactionTable = ({
       cell: (tx: any) => (
         <div className="flex flex-col">
           <span className="font-semibold text-foreground text-sm">
-            {tx.createdBy?.name}
+            {tx.userId?.name || "System"}
           </span>
           <span className="text-[10px] text-muted-foreground">
-            {tx.createdBy?.email}
+            {tx.userId?.email || "—"}
           </span>
         </div>
       ),
@@ -76,11 +76,18 @@ export const TransactionTable = ({
     {
       header: "Reason",
       cell: (tx: any) => (
-        <div
-          className="max-w-[200px] truncate text-sm text-foreground/80"
-          title={tx.reason}
-        >
-          {tx.reason}
+        <div className="space-y-1">
+          <div
+            className="max-w-[200px] truncate text-sm text-foreground/80"
+            title={tx.reason}
+          >
+            {tx.reason}
+          </div>
+          {tx.paymentId && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase bg-blue-100 text-blue-700">
+              💳 {tx.paymentId?.method || "Payment"}
+            </span>
+          )}
         </div>
       ),
     },

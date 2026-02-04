@@ -118,7 +118,7 @@ export default function ProjectDetailsPage() {
                   <Banknote className="h-5 w-5" /> Initial Investment
                 </span>
                 <span className="font-bold text-primary">
-                  ৳{(project.intialInvestment || 0).toLocaleString()}
+                  ৳{(project.initialInvestment || 0).toLocaleString()}
                 </span>
               </div>
               <div className="flex justify-between items-center text-lg">

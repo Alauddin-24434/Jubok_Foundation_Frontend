@@ -1,321 +1,360 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, MapPin, Users, TrendingUp, FileText } from "lucide-react";
+import { 
+  ArrowLeft, 
+  MapPin, 
+  Users, 
+  TrendingUp, 
+  FileText, 
+  Calendar, 
+  Smartphone, 
+  Tag, 
+  CheckCircle2,
+  Clock,
+  AlertCircle,
+  Plus,
+  Trash2
+} from "lucide-react";
 import Link from "next/link";
+import { 
+  useGetProjectQuery, 
+  useAddProjectMemberMutation, 
+  useRemoveProjectMemberMutation 
+} from "@/redux/features/project/projectApi";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
+import { toast } from "react-hot-toast";
+import { useSelector } from "react-redux";
+import { selectCurrentUser } from "@/redux/features/auth/authSlice";
 
 export default function ProjectDetailsPage() {
   const params = useParams();
-  const projectId = params.id;
+  const projectId = params.id as string;
+  const user = useSelector(selectCurrentUser);
 
-  // Mock data - replace with actual API call
-  const project = {
-    id: projectId,
-    name: "Fish Farming Project",
-    description:
-      "Modern fish farming facility with sustainable practices and community benefits",
-    status: "ongoing",
-    location: "Dhaka, Bangladesh",
-    target: 75000,
-    raised: 45000,
-    members: 12,
-    startDate: "2024-01-15",
-    endDate: "2024-12-31",
-    details: {
-      about:
-        "This is a comprehensive fish farming project focused on sustainable aquaculture practices. The project aims to provide high-quality fish products while maintaining environmental standards.",
-      benefits: [
-        "Stable income streams",
-        "Community employment",
-        "Sustainable food production",
-        "Market expansion opportunities",
-      ],
-      risks: [
-        "Market price fluctuations",
-        "Environmental factors",
-        "Supply chain disruptions",
-      ],
-    },
-    members: [
-      {
-        id: 1,
-        name: "Ahmed Hassan",
-        position: "President",
-        joinedDate: "2024-01-15",
-      },
-      {
-        id: 2,
-        name: "Fatima Khan",
-        position: "Treasurer",
-        joinedDate: "2024-01-16",
-      },
-      {
-        id: 3,
-        name: "Mohammad Ali",
-        position: "Secretary",
-        joinedDate: "2024-01-17",
-      },
-    ],
-    timeline: [
-      {
-        date: "2024-01-15",
-        title: "Project Launch",
-        description: "Official project kickoff",
-      },
-      {
-        date: "2024-03-15",
-        title: "Construction Phase",
-        description: "Facility construction begins",
-      },
-      {
-        date: "2024-06-15",
-        title: "Operations Start",
-        description: "Production operations commence",
-      },
-    ],
+  const { data: projectRes, isLoading, error } = useGetProjectQuery(projectId);
+  const [addMember, { isLoading: isAddingMember }] = useAddProjectMemberMutation();
+  const [removeMember] = useRemoveProjectMemberMutation();
+
+  const project = projectRes?.data || projectRes; // Handle different wrapper formats
+
+  if (isLoading) {
+    return (
+      <div className="flex h-[400px] items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (error || !project) {
+    return (
+      <Card className="p-8 text-center max-w-md mx-auto mt-20">
+        <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
+        <h2 className="text-2xl font-bold mb-2">Project Not Found</h2>
+        <p className="text-muted-foreground mb-6">The project you're looking for doesn't exist or you don't have access.</p>
+        <Button asChild>
+          <Link href="/dashboard/projects">Back to Projects</Link>
+        </Button>
+      </Card>
+    );
+  }
+
+  const investmentProgress = Math.min(
+    ((project.totalInvestment || 0) / (project.initialInvestment || 1)) * 100,
+    100
+  );
+
+  const handleAddMe = async () => {
+    try {
+      await addMember({
+        projectId,
+        memberData: {
+          user: user?._id,
+          role: "Member",
+          responsibility: "Investor",
+          active: true
+        }
+      }).unwrap();
+      toast.success("Joined project successfully!");
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to join project");
+    }
   };
 
-  const investmentProgress = (project.raised / project.target) * 100;
+  const handleRemoveMember = async (memberUserId: string) => {
+    if (!window.confirm("Are you sure you want to remove this member?")) return;
+    try {
+      await removeMember({ projectId, userId: memberUserId }).unwrap();
+      toast.success("Member removed");
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to remove member");
+    }
+  };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 animate-in fade-in duration-500">
       {/* Back Button */}
       <Link
         href="/dashboard/projects"
-        className="inline-flex items-center gap-2 text-primary hover:text-primary/80"
+        className="inline-flex items-center gap-2 text-sm font-bold text-muted-foreground hover:text-primary transition-colors"
       >
         <ArrowLeft className="h-4 w-4" />
-        <span>Back to Projects</span>
+        <span>Back to Project Dashboard</span>
       </Link>
 
-      {/* Header */}
-      <div className="space-y-4">
-        <div className="flex items-start justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">
-              {project.name}
-            </h1>
-            <p className="text-foreground/60 mt-2 flex items-center gap-2">
-              <MapPin className="h-4 w-4" />
-              {project.location}
-            </p>
+      {/* Header Section */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <Badge className={`px-4 py-1 rounded-full font-black text-[10px] uppercase tracking-widest ${
+              project.status === 'ongoing' ? 'bg-emerald-100 text-emerald-700' : 
+              project.status === 'upcoming' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'
+            }`}>
+              {project.status}
+            </Badge>
+            <Badge variant="outline" className="px-4 py-1 rounded-full font-black text-[10px] uppercase tracking-widest border-primary/20 text-primary">
+              {project.category}
+            </Badge>
           </div>
-          <span className="px-4 py-2 rounded-full bg-primary/10 text-primary font-medium text-sm">
-            {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
-          </span>
+          <h1 className="text-4xl font-black text-gray-900 tracking-tight">
+            {project.name}
+          </h1>
+          <div className="flex flex-wrap items-center gap-6 text-sm font-medium text-gray-500">
+            <span className="flex items-center gap-2">
+              <MapPin className="h-4 w-4 text-primary" />
+              {project.location}
+            </span>
+            <span className="flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-primary" />
+              Started {new Date(project.startDate).toLocaleDateString()}
+            </span>
+            <span className="flex items-center gap-2">
+              <Smartphone className="h-4 w-4 text-primary" />
+              {project.contactNumber}
+            </span>
+          </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid md:grid-cols-4 gap-4">
-          <Card className="p-4">
-            <p className="text-sm text-foreground/60 mb-1">Funding Progress</p>
-            <p className="text-2xl font-bold text-primary">
-              {Math.round(investmentProgress)}%
-            </p>
-            <div className="w-full h-2 bg-muted rounded-full mt-3 overflow-hidden">
-              <div
-                className="h-full bg-primary"
-                style={{ width: `${investmentProgress}%` }}
-              />
-            </div>
-          </Card>
-          <Card className="p-4">
-            <p className="text-sm text-foreground/60 mb-1">Amount Raised</p>
-            <p className="text-2xl font-bold text-foreground">
-              ৳{(project.raised / 1000).toFixed(0)}k
-            </p>
-            <p className="text-xs text-foreground/60 mt-3">
-              of ৳{(project.target / 1000).toFixed(0)}k target
-            </p>
-          </Card>
-          <Card className="p-4">
-            <p className="text-sm text-foreground/60 mb-1">Active Members</p>
-            <p className="text-2xl font-bold text-foreground">
-              {project.members.length}
-            </p>
-            <p className="text-xs text-foreground/60 mt-3">
-              investors participating
-            </p>
-          </Card>
-          <Card className="p-4">
-            <p className="text-sm text-foreground/60 mb-1">Timeline</p>
-            <p className="text-lg font-bold text-foreground">9 months</p>
-            <p className="text-xs text-foreground/60 mt-3">remaining</p>
-          </Card>
+        <div className="flex flex-col sm:flex-row gap-3">
+          {(user?.role === 'SUPER_ADMIN' || user?.role === 'ADMIN') && (
+            <Button asChild variant="outline" className="font-bold rounded-xl h-12 border-gray-200">
+              <Link href={`/dashboard/projects/${projectId}/edit`}>Edit Project</Link>
+            </Button>
+          )}
+          <Button className="font-black rounded-xl h-12 px-8 bg-primary hover:bg-primary/90 shadow-xl shadow-primary/20 transition-all hover:scale-[1.02]">
+            Invest Now
+          </Button>
         </div>
       </div>
 
-      {/* Tabs */}
-      <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="members">Members</TabsTrigger>
-          <TabsTrigger value="timeline">Timeline</TabsTrigger>
-        </TabsList>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Main Content Area */}
+        <div className="lg:col-span-2 space-y-8">
+          <Tabs defaultValue="overview" className="w-full">
+            <TabsList className="bg-gray-100/50 p-1.5 rounded-2xl mb-6 flex overflow-x-auto h-auto no-scrollbar">
+              <TabsTrigger value="overview" className="flex-1 rounded-xl font-black text-xs uppercase py-3 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                Overview
+              </TabsTrigger>
+              <TabsTrigger value="members" className="flex-1 rounded-xl font-black text-xs uppercase py-3 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                Participants ({project.memberCount || 0})
+              </TabsTrigger>
+              <TabsTrigger value="gallery" className="flex-1 rounded-xl font-black text-xs uppercase py-3 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                Vitals & Media
+              </TabsTrigger>
+            </TabsList>
 
-        {/* Overview Tab */}
-        <TabsContent value="overview" className="space-y-4">
-          <Card className="p-6">
-            <h3 className="font-semibold text-foreground mb-3">
-              About This Project
-            </h3>
-            <p className="text-foreground/70">{project.details.about}</p>
-
-            <div className="grid md:grid-cols-2 gap-8 mt-8">
-              <div>
-                <h4 className="font-semibold text-foreground mb-3">Benefits</h4>
-                <ul className="space-y-2">
-                  {project.details.benefits.map((benefit, idx) => (
-                    <li
-                      key={idx}
-                      className="flex items-start gap-3 text-foreground/70"
-                    >
-                      <span className="text-primary mt-1.5">✓</span>
-                      <span>{benefit}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-semibold text-foreground mb-3">
-                  Risk Factors
-                </h4>
-                <ul className="space-y-2">
-                  {project.details.risks.map((risk, idx) => (
-                    <li
-                      key={idx}
-                      className="flex items-start gap-3 text-foreground/70"
-                    >
-                      <span className="text-accent mt-1.5">!</span>
-                      <span>{risk}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-6">
-            <h3 className="font-semibold text-foreground mb-4">
-              Investment Details
-            </h3>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between py-2 border-b border-border">
-                <span className="text-foreground/60">Total Target</span>
-                <span className="font-semibold">
-                  ৳{(project.target / 1000).toFixed(0)}k
-                </span>
-              </div>
-              <div className="flex items-center justify-between py-2 border-b border-border">
-                <span className="text-foreground/60">Currently Raised</span>
-                <span className="font-semibold">
-                  ৳{(project.raised / 1000).toFixed(0)}k
-                </span>
-              </div>
-              <div className="flex items-center justify-between py-2 border-b border-border">
-                <span className="text-foreground/60">Remaining</span>
-                <span className="font-semibold">
-                  ৳{((project.target - project.raised) / 1000).toFixed(0)}k
-                </span>
-              </div>
-              <div className="flex items-center justify-between py-2">
-                <span className="text-foreground/60">Start Date</span>
-                <span className="font-semibold">
-                  {new Date(project.startDate).toLocaleDateString()}
-                </span>
-              </div>
-            </div>
-          </Card>
-
-          <Button className="w-full" size="lg">
-            Invest in This Project
-          </Button>
-        </TabsContent>
-
-        {/* Members Tab */}
-        <TabsContent value="members" className="space-y-4">
-          <Card className="p-6">
-            <h3 className="font-semibold text-foreground mb-4">
-              Project Members
-            </h3>
-            <div className="space-y-3">
-              {project.members.map((member) => (
-                <div
-                  key={member.id}
-                  className="flex items-center justify-between p-4 border border-border rounded-lg"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                      <span className="text-sm font-semibold text-primary">
-                        {member.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
-                      </span>
-                    </div>
-                    <div>
-                      <p className="font-medium text-foreground">
-                        {member.name}
-                      </p>
-                      <p className="text-sm text-foreground/60">
-                        {member.position}
-                      </p>
-                    </div>
+            <TabsContent value="overview" className="space-y-6">
+              <Card className="rounded-3xl border-gray-100 shadow-sm overflow-hidden">
+                <CardHeader className="bg-gray-50/50 border-b border-gray-100 p-8">
+                  <CardTitle className="text-lg font-black uppercase tracking-widest text-gray-700 flex items-center gap-3">
+                    <FileText className="w-5 h-5 text-primary" />
+                    Narrative & Roadmap
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-8">
+                  <div className="prose prose-emerald max-w-none text-gray-600 leading-relaxed font-medium">
+                    {project.description}
                   </div>
-                  <p className="text-xs text-foreground/60">
-                    Joined {new Date(member.joinedDate).toLocaleDateString()}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </Card>
+                </CardContent>
+              </Card>
 
-          <Card className="p-6">
-            <h3 className="font-semibold text-foreground mb-4">
-              Request to Join
-            </h3>
-            <p className="text-foreground/70 mb-4">
-              Interested in joining this project?
-            </p>
-            <Button className="w-full">Send Join Request</Button>
-          </Card>
-        </TabsContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card className="rounded-3xl border-gray-100 shadow-sm border-l-4 border-l-emerald-500">
+                  <CardContent className="p-6 space-y-4">
+                    <h3 className="font-black text-emerald-700 uppercase tracking-widest text-xs">Vitals</h3>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center bg-emerald-50/50 p-3 rounded-xl">
+                        <span className="text-xs font-bold text-emerald-600">Category</span>
+                        <span className="text-xs font-black text-gray-900">{project.category}</span>
+                      </div>
+                      <div className="flex justify-between items-center bg-gray-50 p-3 rounded-xl">
+                        <span className="text-xs font-bold text-gray-500">Start Date</span>
+                        <span className="text-xs font-black text-gray-900">{new Date(project.startDate).toDateString()}</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
 
-        {/* Timeline Tab */}
-        <TabsContent value="timeline" className="space-y-4">
-          <Card className="p-6">
-            <h3 className="font-semibold text-foreground mb-6">
-              Project Timeline
-            </h3>
-            <div className="space-y-6">
-              {project.timeline.map((event, idx) => (
-                <div key={idx} className="flex gap-4">
-                  <div className="flex flex-col items-center">
-                    <div className="w-3 h-3 rounded-full bg-primary mt-2" />
-                    {idx < project.timeline.length - 1 && (
-                      <div className="w-0.5 h-24 bg-border my-2" />
+                <Card className="rounded-3xl border-gray-100 shadow-sm border-l-4 border-l-blue-500">
+                  <CardContent className="p-6 space-y-4">
+                    <h3 className="font-black text-blue-700 uppercase tracking-widest text-xs">Authority</h3>
+                    <div className="flex items-center gap-4 bg-blue-50/30 p-3 rounded-2xl">
+                       <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-black text-sm">
+                        {project.createdBy?.name?.[0].toUpperCase()}
+                       </div>
+                       <div>
+                         <p className="text-xs font-black text-gray-900">{project.createdBy?.name}</p>
+                         <p className="text-[10px] font-bold text-blue-600">Project Architect</p>
+                       </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="members" className="space-y-6">
+              <Card className="rounded-3xl border-gray-100 shadow-sm">
+                <CardHeader className="p-8 border-b border-gray-50 flex flex-row items-center justify-between bg-gray-50/30">
+                  <CardTitle className="text-lg font-black uppercase tracking-widest text-gray-700 flex items-center gap-3">
+                    <Users className="w-5 h-5 text-primary" />
+                    Member Roster
+                  </CardTitle>
+                  <Button 
+                    onClick={handleAddMe} 
+                    disabled={isAddingMember}
+                    className="rounded-xl font-black text-xs uppercase tracking-widest bg-emerald-600 hover:bg-emerald-700 transition-all hover:scale-105"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Join This Project
+                  </Button>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <div className="divide-y divide-gray-50 py-4">
+                    {project.members && project.members.length > 0 ? (
+                      project.members.map((member: any, idx: number) => (
+                        <div key={idx} className="flex items-center justify-between px-8 py-5 hover:bg-gray-50/50 transition-colors group">
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/10 flex items-center justify-center text-primary font-black text-sm">
+                              {member.user?.name?.[0] || 'U'}
+                            </div>
+                            <div>
+                              <p className="font-black text-gray-900 text-sm">{member.user?.name || 'Anonymous'}</p>
+                              <div className="flex items-center gap-2 mt-0.5">
+                                <Badge variant="secondary" className="px-2 py-0 h-5 text-[9px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-600 border-none">
+                                  {member.role || 'Member'}
+                                </Badge>
+                                <span className="text-[10px] font-bold text-gray-400">{member.responsibility}</span>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {(user?.role === 'SUPER_ADMIN' || user?.role === 'ADMIN' || user?._id === member.user?._id) && (
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              onClick={() => handleRemoveMember(member.user?._id)}
+                              className="opacity-0 group-hover:opacity-100 transition-opacity text-rose-500 hover:text-rose-600 hover:bg-rose-50"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          )}
+                        </div>
+                      ))
+                    ) : (
+                      <div className="py-20 text-center space-y-4">
+                        <Users className="w-12 h-12 text-gray-200 mx-auto" />
+                        <p className="text-sm font-bold text-gray-400">No members participating yet.</p>
+                      </div>
                     )}
                   </div>
-                  <div className="pb-6">
-                    <p className="text-sm text-foreground/60">
-                      {new Date(event.date).toLocaleDateString()}
-                    </p>
-                    <h4 className="font-semibold text-foreground mt-1">
-                      {event.title}
-                    </h4>
-                    <p className="text-foreground/70 text-sm mt-1">
-                      {event.description}
-                    </p>
-                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="gallery" className="grid grid-cols-1 md:grid-cols-2 gap-6">
+               <Card className="rounded-3xl border-gray-100 shadow-sm overflow-hidden">
+                  <CardHeader className="p-6 border-b border-gray-50 flex items-center gap-2 bg-gray-50/30">
+                    <TrendingUp className="w-4 h-4 text-primary" />
+                    <CardTitle className="text-xs font-black uppercase tracking-widest text-gray-500">Media Assets</CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="aspect-video w-full rounded-2xl bg-muted overflow-hidden relative group">
+                      <img 
+                        src={project.thumbnail} 
+                        alt="Thumbnail" 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+                      />
+                      <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center">
+                        <p className="text-white text-xs font-black opacity-0 group-hover:opacity-100 transition-opacity uppercase tracking-widest">Main Showcase</p>
+                      </div>
+                    </div>
+                  </CardContent>
+               </Card>
+            </TabsContent>
+          </Tabs>
+        </div>
+
+        {/* Sidebar Financials */}
+        <div className="space-y-6">
+          <Card className="rounded-3xl border-gray-100 shadow-2xl overflow-hidden sticky top-24">
+            <CardHeader className="bg-primary p-8 text-primary-foreground relative overflow-hidden">
+               <div className="relative z-10 space-y-2">
+                 <p className="text-[10px] font-black uppercase tracking-widest opacity-80">Fiscal Standing</p>
+                 <h2 className="text-4xl font-black">
+                   ৳{(project.totalInvestment || 0).toLocaleString()}
+                 </h2>
+                 <p className="text-[11px] font-bold opacity-70 italic">Capital accumulated from {project.memberCount || 0} participants</p>
+               </div>
+               <TrendingUp className="absolute bottom-[-20%] right-[-10%] w-40 h-40 text-black/10 -rotate-12" />
+            </CardHeader>
+            <CardContent className="p-8 space-y-8">
+              <div className="space-y-3">
+                <div className="flex justify-between items-end">
+                   <p className="text-xs font-black text-gray-400 uppercase tracking-widest">Growth</p>
+                   <p className="text-lg font-black text-primary">{Math.round(investmentProgress)}%</p>
                 </div>
-              ))}
-            </div>
+                <Progress value={investmentProgress} className="h-4 bg-gray-100 rounded-full overflow-hidden">
+                   <div className="h-full bg-primary rounded-full" />
+                </Progress>
+              </div>
+
+              <div className="space-y-4">
+                 <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-3">
+                       <Badge className="bg-blue-100 text-blue-700 p-2 rounded-xl"><Clock className="w-4 h-4" /></Badge>
+                       <span className="font-bold text-gray-500">Target Capital</span>
+                    </div>
+                    <span className="font-black text-gray-900">৳{(project.initialInvestment || 0).toLocaleString()}</span>
+                 </div>
+                 <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-3">
+                       <Badge className="bg-emerald-100 text-emerald-700 p-2 rounded-xl"><CheckCircle2 className="w-4 h-4" /></Badge>
+                       <span className="font-bold text-gray-500">Raised</span>
+                    </div>
+                    <span className="font-black text-emerald-600">৳{(project.totalInvestment || 0).toLocaleString()}</span>
+                 </div>
+                 <Separator className="bg-gray-50" />
+                 <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-3">
+                       <Badge className="bg-rose-50 text-rose-600 p-2 rounded-xl"><AlertCircle className="w-4 h-4" /></Badge>
+                       <span className="font-bold text-gray-500">Delta</span>
+                    </div>
+                    <span className="font-black text-rose-600">৳{Math.max(0, (project.initialInvestment || 0) - (project.totalInvestment || 0)).toLocaleString()}</span>
+                 </div>
+              </div>
+
+              <Button className="w-full h-14 rounded-2xl bg-gray-900 hover:bg-black text-white font-black text-sm uppercase tracking-widest transition-all hover:scale-[1.02] shadow-xl">
+                 Generate Report
+              </Button>
+            </CardContent>
           </Card>
-        </TabsContent>
-      </Tabs>
+        </div>
+      </div>
     </div>
   );
 }

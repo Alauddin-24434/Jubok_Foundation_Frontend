@@ -1,8 +1,5 @@
-// ====================================================
-// 🧾 Auth API Module - User Authentication & Management
-// ====================================================
-
 import baseApi from "@/redux/baseApi";
+import { setUser, updateUser } from "./authSlice";
 
 // ===== 🔹 Inject auth-related endpoints into baseApi =====
 const authApi = baseApi.injectEndpoints({
@@ -25,13 +22,32 @@ const authApi = baseApi.injectEndpoints({
       }),
     }),
 
-    // ===== ✅ Get current logged-in user info =====
     getMe: build.query({
       query: () => ({
         url: "/auth/me",
         method: "GET",
       }),
       providesTags: ["Auth"],
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          if (data?.data?.user && data?.data?.accessToken) {
+            dispatch(
+              setUser({
+                user: data.data.user,
+                accessToken: data.data.accessToken,
+              })
+            );
+          } else if (data?.data?.user) {
+            dispatch(updateUser(data.data.user));
+          } else if (data?.data?._id) {
+            // If data itself is the user object
+            dispatch(updateUser(data.data));
+          }
+        } catch (error) {
+          console.error("Error syncing user data:", error);
+        }
+      },
     }),
 
     // ===== ✅ Get all users (admin access) with filters =====

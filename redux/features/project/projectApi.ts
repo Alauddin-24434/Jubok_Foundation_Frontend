@@ -40,6 +40,36 @@ const projectApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Project"],
     }),
+
+    // 👥 MEMBER MANAGEMENT
+    getProjectMembers: builder.query({
+      query: (id) => ({
+        url: `/projects/${id}/members`,
+        method: "GET",
+      }),
+      providesTags: (result, error, id) => [{ type: "Project", id: `MEMBERS-${id}` }],
+    }),
+    addProjectMember: builder.mutation({
+      query: ({ projectId, memberData }) => ({
+        url: `/projects/${projectId}/members`,
+        method: "POST",
+        body: memberData,
+      }),
+      invalidatesTags: (result, error, { projectId }) => [
+        "Project",
+        { type: "Project", id: `MEMBERS-${projectId}` },
+      ],
+    }),
+    removeProjectMember: builder.mutation({
+      query: ({ projectId, userId }) => ({
+        url: `/projects/${projectId}/members/${userId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: (result, error, { projectId }) => [
+        "Project",
+        { type: "Project", id: `MEMBERS-${projectId}` },
+      ],
+    }),
   }),
 });
 
@@ -49,4 +79,7 @@ export const {
   useCreateProjectMutation,
   useUpdateProjectMutation,
   useDeleteProjectMutation,
+  useGetProjectMembersQuery,
+  useAddProjectMemberMutation,
+  useRemoveProjectMemberMutation,
 } = projectApi;

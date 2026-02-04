@@ -1,12 +1,5 @@
 "use client";
 
-//==================================================================================
-//                               PAYMENT GOVERNANCE
-//==================================================================================
-// Description: Auditing system for verifying and approving financial contributions.
-// Features: Transaction verification, status tracking, and automated approval.
-//==================================================================================
-
 import { useState } from "react";
 import {
   useGetPaymentsQuery,
@@ -29,15 +22,19 @@ import { VerifyPaymentModal } from "@/components/verifyPaymentModel";
 import { AFPageHeader } from "@/components/shared/AFPageHeader";
 import { AFSearchFilters } from "@/components/shared/AFSearchFilters";
 import { AFDataTable } from "@/components/shared/AFDataTable";
+import { AFSectionTitle } from "@/components/shared/AFSectionTitle";
+import { AFPagination } from "@/components/shared/AFPagination";
+import { Card } from "@/components/ui/card";
 import {
-  ChevronLeft,
-  ChevronRight,
-  Hash,
   Phone,
   User as UserIcon,
   Calendar,
   CheckCircle,
   Clock,
+  ShieldCheck,
+  CreditCard,
+  AlertCircle,
+  Wallet,
 } from "lucide-react";
 
 /**
@@ -54,6 +51,7 @@ const STATUS_TABS = [
 export default function AdminPaymentsPage() {
   //======================   STATE & HOOKS   ===============================
   const [page, setPage] = useState(1);
+  const [limit] = useState(10);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("ALL");
 
@@ -62,17 +60,20 @@ export default function AdminPaymentsPage() {
   const [openConfirm, setOpenConfirm] = useState(false);
 
   //======================   API SYNCHRONIZATION   ===============================
-  const { data, isLoading } = useGetPaymentsQuery({
+  const { data: paymentsResponse, isLoading } = useGetPaymentsQuery({
     page,
-    limit: 10,
+    limit,
     status: status === "ALL" ? undefined : status,
-    search,
+    search: search || undefined,
     sortBy: "createdAt",
     sortOrder: "desc",
   });
 
   const [approvePayment, { isLoading: approving }] =
     useApprovePaymentMutation();
+
+  const payments = paymentsResponse?.data || [];
+  const meta = paymentsResponse?.meta || { totalPages: 1, total: 0 };
 
   //======================   EVENT HANDLERS   ===============================
   const handleApprove = async () => {
@@ -102,36 +103,43 @@ export default function AdminPaymentsPage() {
     {
       header: "Contributor Identity",
       cell: (payment: any) => (
-        <div className="flex items-center gap-3">
-          <div className="h-9 w-9 bg-primary/10 rounded-full flex items-center justify-center text-primary font-black">
-            <UserIcon size={16} />
+        <div className="flex items-center gap-4">
+          <div className="h-10 w-10 bg-primary/5 rounded-2xl flex items-center justify-center text-primary font-black shadow-inner">
+             {payment.userId?.name?.charAt(0) || <UserIcon size={16} />}
           </div>
           <div className="flex flex-col">
             <span className="font-bold text-foreground tracking-tight text-sm">
-              {payment.userId?.name}
+              {payment.userId?.name || "Anonymous Donor"}
             </span>
-            <span className="text-[10px] text-muted-foreground font-medium italic">
-              {payment.userId?.email}
+            <span className="text-[10px] text-muted-foreground/60 font-bold uppercase tracking-tighter">
+              {payment.userId?.email || "No digital trail"}
             </span>
           </div>
         </div>
       ),
     },
     {
-      header: "Contact Hook",
+      header: "Contact Method",
       cell: (payment: any) => (
-        <div className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground">
-          <Phone size={12} className="text-primary/60" />
-          {payment.senderNumber}
+        <div className="flex flex-col">
+          <div className="flex items-center gap-1.5 text-xs font-black text-foreground">
+            <Phone size={10} className="text-primary/40" />
+            {payment.senderNumber || payment.userId?.phone || "Verified User"}
+          </div>
+          <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest mt-0.5">
+            {payment.method === "STRIPE" ? "Stripe AES-256" : 
+             payment.method === "SSLCOMMERZ" ? "SSLCommerz 3D" : 
+             `${payment.method} Network`}
+          </div>
         </div>
       ),
     },
     {
-      header: "Net Amount",
+      header: "Net Settlement",
       cell: (payment: any) => (
-        <div className="flex items-center gap-1 font-black text-foreground bg-muted/30 px-2 py-1 rounded-lg w-fit">
-          <span className="text-primary opacity-60">৳</span>
-          {payment.amount.toLocaleString()}
+        <div className="flex items-center gap-1.5 font-black text-foreground bg-primary/5 border border-primary/10 px-3 py-1.5 rounded-xl w-fit">
+          <span className="text-primary/40 text-[10px]">৳</span>
+          <span className="text-sm">{(payment.amount || 0).toLocaleString()}</span>
         </div>
       ),
     },
@@ -139,55 +147,65 @@ export default function AdminPaymentsPage() {
       header: "Audit Status",
       cell: (payment: any) => (
         <Badge
-          className={`uppercase text-[9px] font-black px-2 py-0.5 tracking-tighter ${
-            payment.status === "PAID"
-              ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20 shadow-none"
-              : payment.status === "PENDING"
-                ? "bg-amber-500/10 text-amber-600 border-amber-500/20 shadow-none"
-                : "bg-red-500/10 text-red-600 border-red-500/20 shadow-none"
+          className={`uppercase text-[9px] font-black px-2.5 py-1 tracking-widest rounded-lg border-2 shadow-none ${
+            payment.paymentStatus === "PAID"
+              ? "bg-emerald-500/5 text-emerald-600 border-emerald-500/20"
+              : payment.paymentStatus === "PENDING"
+                ? "bg-amber-500/5 text-amber-600 border-amber-500/20"
+                : "bg-red-500/5 text-red-600 border-red-500/20"
           }`}
           variant="outline"
         >
-          {payment.status === "PAID" ? (
-            <CheckCircle size={10} className="mr-1" />
+          {payment.paymentStatus === "PAID" ? (
+            <CheckCircle size={10} className="mr-1.5" />
+          ) : payment.paymentStatus === "PENDING" ? (
+            <Clock size={10} className="mr-1.5 animate-pulse" />
           ) : (
-            <Clock size={10} className="mr-1" />
+            <AlertCircle size={10} className="mr-1.5" />
           )}
-          {payment.status}
+          {payment.paymentStatus}
         </Badge>
       ),
     },
     {
-      header: "Verification",
+      header: "Management",
       cell: (payment: any) =>
-        payment.status === "PENDING" ? (
+        payment.paymentStatus === "PENDING" ? (
           <Button
             size="sm"
             variant="ghost"
-            className="h-8 text-[10px] font-black uppercase tracking-widest bg-primary/5 hover:bg-primary hover:text-white transition-all border border-primary/20"
+            className="h-10 px-6 text-[10px] font-black uppercase tracking-widest bg-emerald-500/5 text-emerald-600 hover:bg-emerald-600 hover:text-white transition-all rounded-xl border border-emerald-500/20 shadow-sm"
             onClick={() => {
               setSelectedPayment(payment);
               setOpenVerify(true);
             }}
           >
-            Verify Claim
+            Authorize Claim
           </Button>
         ) : (
-          <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/40 italic">
-            Closed Trace
+          <div className="flex items-center gap-2 px-4 py-2 bg-muted/20 w-fit rounded-xl border border-muted/30">
+            <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/30" />
+            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
+              Audit Closed
+            </span>
           </div>
         ),
     },
     {
       header: "Record Date",
       cell: (payment: any) => (
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground/80 font-medium">
-          <Calendar size={12} />
-          {new Date(payment.createdAt).toLocaleDateString("en-GB", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-          })}
+        <div className="flex flex-col">
+          <div className="flex items-center gap-1.5 text-xs text-foreground font-black">
+            <Calendar size={10} className="text-primary/40" />
+            {new Date(payment.createdAt).toLocaleDateString("en-GB", {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+            })}
+          </div>
+          <span className="text-[9px] text-muted-foreground font-black uppercase tracking-tighter mt-0.5">
+            {new Date(payment.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </span>
         </div>
       ),
     },
@@ -195,75 +213,88 @@ export default function AdminPaymentsPage() {
 
   //======================   MAIN RENDER   ===============================
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      {/* Header Section */}
+    <div className="max-w-[1400px] mx-auto space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-1000 pb-20">
+      {/* Page Header */}
       <AFPageHeader
         title="Contribution Ledger"
-        description="Verify financial commitments and authorize membership activations via transaction claims."
+        description="Audit systemic financial commitments, verify transaction integrity, and authorize membership activations."
       />
 
-      {/* Global Search & Multi-State Filtering */}
-      <AFSearchFilters
-        searchValue={search}
-        onSearchChange={(val) => {
-          setSearch(val);
-          setPage(1);
-        }}
-        searchPlaceholder="Reverse lookup via contributor identity or phone sequence..."
-        filters={STATUS_TABS}
-        activeFilter={status}
-        onFilterChange={handleStatusChange}
-      />
-
-      {/* Audit Data Infrastructure */}
-      <div className="rounded-3xl border border-muted/30 overflow-hidden shadow-2xl bg-card/50 backdrop-blur-sm">
-        <AFDataTable
-          columns={columns}
-          data={data?.data || []}
-          isLoading={isLoading}
-          emptyMessage="No transaction entities discovered within this sector."
-        />
+       {/* Quick Stats Banner */}
+       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+         <Card className="p-6 border-none bg-card/40 backdrop-blur-md shadow-sm flex items-center gap-6 rounded-[2rem]">
+            <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+               <CreditCard size={28} />
+            </div>
+            <div>
+               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/50">Ledger Count</p>
+               <p className="text-3xl font-black">{meta.total || 0}</p>
+            </div>
+         </Card>
+         <Card className="p-6 border-none bg-card/40 backdrop-blur-md shadow-sm flex items-center gap-6 rounded-[2rem]">
+            <div className="h-14 w-14 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500">
+               <Clock size={28} />
+            </div>
+            <div>
+               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/50">Pending Audit</p>
+               <p className="text-3xl font-black">{payments.filter((p: any) => p.status === 'PENDING').length}</p>
+            </div>
+         </Card>
+         <Card className="p-6 border-none bg-card/40 backdrop-blur-md shadow-sm flex items-center gap-6 rounded-[2rem]">
+            <div className="h-14 w-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+               <Wallet size={28} />
+            </div>
+            <div>
+               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/50">Settled Funds</p>
+               <p className="text-3xl font-black">৳{(payments.filter((p: any) => p.status === 'PAID').reduce((acc: number, curr: any) => acc + curr.amount, 0) / 1000).toFixed(1)}k</p>
+            </div>
+         </Card>
       </div>
 
-      {/* Pagination Infrastructure */}
-      {data && data.meta && data.meta.totalPages > 1 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 py-8 bg-muted/10 rounded-2xl">
-          <div className="text-xs font-black uppercase tracking-widest text-muted-foreground">
-            Ledger Sector <span className="text-primary">{data.meta.page}</span>{" "}
-            / {data.meta.totalPages}
-          </div>
-          <div className="flex gap-3">
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={page === 1}
-              onClick={() => {
-                setPage((p) => p - 1);
-                window.scrollTo({ top: 0, behavior: "smooth" });
-              }}
-              className="h-10 px-6 rounded-xl font-bold bg-background shadow-sm hover:shadow-md transition-all"
-            >
-              <ChevronLeft className="h-4 w-4 mr-2" />
-              Prev Sector
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={page === data.meta.totalPages}
-              onClick={() => {
-                setPage((p) => p + 1);
-                window.scrollTo({ top: 0, behavior: "smooth" });
-              }}
-              className="h-10 px-6 rounded-xl font-bold bg-background shadow-sm hover:shadow-md transition-all"
-            >
-              Next Sector
-              <ChevronRight className="h-4 w-4 ml-2" />
-            </Button>
-          </div>
-        </div>
-      )}
+      <div className="space-y-8">
+        <AFSectionTitle 
+          title="Financial Infrastructure" 
+          subtitle="Real-time transaction monitoring and lifecycle management for all incoming contributions."
+          badge="Audit Stream"
+        />
 
-      {/* Verification Components (Hidden State) */}
+        <div className="rounded-[3rem] overflow-hidden bg-card/30 backdrop-blur-md border border-muted/20 shadow-2xl p-8">
+          {/* Filtering Infrastructure */}
+          <AFSearchFilters
+            searchValue={search}
+            onSearchChange={(val) => {
+              setSearch(val);
+              setPage(1);
+            }}
+            searchPlaceholder="Identify records via phone sequence, contributor hash, or digital trail..."
+            filters={STATUS_TABS}
+            activeFilter={status}
+            onFilterChange={handleStatusChange}
+          />
+
+          {/* Data Infrastructure */}
+          <div className="mt-10 rounded-[2rem] overflow-hidden shadow-2xl border border-muted/10 bg-card/50">
+            <AFDataTable
+              columns={columns}
+              data={payments}
+              isLoading={isLoading}
+              emptyMessage="No transaction entities discovered within this sector."
+            />
+          </div>
+
+          {/* Pagination Infrastructure */}
+          <AFPagination 
+             currentPage={page}
+             totalPages={meta.totalPages}
+             onPageChange={(p) => {
+               setPage(p);
+               window.scrollTo({ top: 0, behavior: 'smooth' });
+             }}
+          />
+        </div>
+      </div>
+
+      {/* Verification Infrastructure */}
       <VerifyPaymentModal
         open={openVerify}
         onClose={() => setOpenVerify(false)}
@@ -273,30 +304,29 @@ export default function AdminPaymentsPage() {
       />
 
       <AlertDialog open={openConfirm} onOpenChange={setOpenConfirm}>
-        <AlertDialogContent className="rounded-3xl border-none shadow-3xl overflow-hidden p-0">
-          <div className="bg-emerald-500/10 p-8 flex flex-col items-center gap-4 text-center">
-            <div className="h-16 w-16 bg-emerald-500 rounded-full flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
-              <CheckCircle size={32} />
+        <AlertDialogContent className="rounded-[3rem] border-none shadow-3xl overflow-hidden p-0 max-w-[500px]">
+          <div className="bg-emerald-500/10 p-12 flex flex-col items-center gap-6 text-center">
+            <div className="h-20 w-20 bg-emerald-600 rounded-[2rem] flex items-center justify-center text-white shadow-2xl shadow-emerald-600/30 scale-110">
+              <ShieldCheck size={40} />
             </div>
-            <div className="space-y-1">
-              <AlertDialogTitle className="text-2xl font-black text-emerald-900 tracking-tight">
-                Authorization Required
+            <div className="space-y-2">
+              <AlertDialogTitle className="text-3xl font-black text-emerald-950 tracking-tighter uppercase">
+                Confirm Settlement
               </AlertDialogTitle>
-              <AlertDialogDescription className="text-emerald-700/70 font-medium">
-                Confirming this transaction will grant full system access to the
-                contributor.
+              <AlertDialogDescription className="text-emerald-700 font-bold text-sm max-w-xs mx-auto tabular-nums">
+                Analyzing transaction integrity... Proceeding will authorize full system access for ID: {selectedPayment?.userId?.name || 'NODE'}.
               </AlertDialogDescription>
             </div>
           </div>
 
-          <div className="p-8 pt-4 flex flex-col sm:flex-row gap-3">
-            <AlertDialogCancel className="flex-1 rounded-2xl h-12 font-bold border-muted-foreground/20 hover:bg-muted">
-              Discard Protocol
+          <div className="p-10 pt-6 flex flex-col sm:flex-row gap-4">
+            <AlertDialogCancel className="flex-1 rounded-2xl h-14 font-black uppercase text-[10px] tracking-widest border-muted shadow-sm hover:bg-muted transition-all">
+              Abort Protocol
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleApprove}
               disabled={approving}
-              className="flex-1 rounded-2xl h-12 bg-emerald-600 hover:bg-emerald-700 font-black shadow-lg shadow-emerald-600/20 transition-all hover:scale-[1.02]"
+              className="flex-1 rounded-2xl h-14 bg-emerald-600 hover:bg-emerald-700 font-black uppercase text-[10px] tracking-widest shadow-2xl shadow-emerald-600/30 transition-all hover:scale-105"
             >
               {approving ? "Encoding..." : "Verify & Authorize"}
             </AlertDialogAction>
