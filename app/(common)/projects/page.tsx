@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Search, Filter, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import ProjectCard from "@/components/projects/ProjectCard";
+import { AFPagination } from "@/components/shared/AFPagination";
 
 export default function ProjectsPage() {
   const { t } = useTranslation();
@@ -120,27 +121,14 @@ export default function ProjectsPage() {
                 ))}
               </div>
 
-              {data.totalPages > 1 && (
-                <div className="flex justify-center gap-2 pt-8">
-                  <Button
-                    variant="outline"
-                    disabled={page === 1}
-                    onClick={() => setPage((prev) => prev - 1)}
-                  >
-                    {t("common.previous")}
-                  </Button>
-                  <div className="flex items-center px-4 text-sm font-medium">
-                    {t("common.pageOf", { page, total: data.totalPages })}
-                  </div>
-                  <Button
-                    variant="outline"
-                    disabled={page === data.totalPages}
-                    onClick={() => setPage((prev) => prev + 1)}
-                  >
-                    {t("common.next")}
-                  </Button>
-                </div>
-              )}
+              <AFPagination
+                currentPage={page}
+                totalPages={data.meta?.totalPages || data.totalPages || 1}
+                onPageChange={(p) => {
+                  setPage(p);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+              />
             </>
           ) : (
             <div className="text-center py-20 bg-background/50 backdrop-blur-sm rounded-xl border-2 border-dashed border-border/50 transition-all">

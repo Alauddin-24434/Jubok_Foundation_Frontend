@@ -201,7 +201,7 @@ export default function BannersPage() {
         action={
           <Button
             onClick={() => setIsModalOpen(true)}
-            className="rounded-xl shadow-lg shadow-primary/20 h-11 px-6 font-black scale-100 hover:scale-105 active:scale-95 transition-all"
+            className="rounded-xl shadow-lg cursor-pointer shadow-primary/20 h-11 px-6 font-black scale-100 hover:scale-105 active:scale-95 transition-all"
           >
             <Plus className="h-5 w-5 mr-2" />
             New Banner Asset
@@ -302,7 +302,7 @@ export default function BannersPage() {
                 <Button
                   type="button"
                   variant={formData.isActive ? "default" : "outline"}
-                  className={`h-11 rounded-xl font-bold transition-all ${formData.isActive ? "bg-emerald-500 hover:bg-emerald-600" : ""}`}
+                  className={`h-11  cursor-pointer rounded-xl font-bold transition-all ${formData.isActive ? "bg-emerald-500 hover:bg-emerald-600" : ""}`}
                   onClick={() =>
                     setFormData({ ...formData, isActive: !formData.isActive })
                   }
@@ -318,13 +318,13 @@ export default function BannersPage() {
               type="button"
               variant="outline"
               onClick={() => setIsModalOpen(false)}
-              className="rounded-xl px-8 order-2 sm:order-1 font-bold"
+              className="rounded-xl cursor-pointer px-8 order-2 sm:order-1 font-bold"
             >
               Discard Changes
             </Button>
             <Button
               type="submit"
-              className="rounded-xl px-10 font-black shadow-lg shadow-primary/20 order-1 sm:order-2"
+              className="rounded-xl cursor-pointer px-10 font-black shadow-lg shadow-primary/20 order-1 sm:order-2"
             >
               Commit Asset
             </Button>

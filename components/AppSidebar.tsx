@@ -19,6 +19,10 @@ import {
   Image as ImageIcon,
   Bell,
   ChevronRight,
+  Heart,
+  Zap,
+  Receipt,
+  Globe,
 } from "lucide-react";
 import {
   Sidebar,
@@ -36,13 +40,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { useDispatch } from "react-redux";
-import { logout, UserRole } from "@/redux/features/auth/authSlice";
+import { logout, UserRole, UserStatus } from "@/redux/features/auth/authSlice";
 import { useLogoutUserMutation } from "@/redux/features/auth/authApi";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
 import { useRouter, usePathname } from "next/navigation";
 import baseApi from "@/redux/baseApi";
+import { useEffect } from "react";
 
 //======================   SIDEBAR CONFIGURATION   ===============================
 interface SidebarItem {
@@ -50,80 +55,102 @@ interface SidebarItem {
   url: string;
   icon: React.ComponentType<any>;
   roles: UserRole[];
+  key: string;
 }
 
 export const sidebarItems: SidebarItem[] = [
   {
     title: "Command Center",
+    key: "sidebar.commandCenter",
     url: "/dashboard",
     icon: Home,
-    roles: [
-      UserRole.SUPER_ADMIN,
-      UserRole.ADMIN,
-      UserRole.MEMBER,
-      UserRole.GUEST,
-    ],
+    roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MEMBER, UserRole.USER],
+  },
+  {
+    title: "Account Activation",
+    key: "sidebar.membership",
+    url: "/dashboard/membership",
+    icon: Zap,
+    roles: [UserRole.USER],
   },
   {
     title: "Member Directory",
+    key: "sidebar.users",
     url: "/dashboard/users",
     icon: Users,
     roles: [UserRole.SUPER_ADMIN],
   },
   {
     title: "Financial Audit",
+    key: "sidebar.payments",
     url: "/dashboard/payments",
     icon: CreditCard,
     roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
   },
   {
     title: "Foundation Vault",
+    key: "sidebar.funds",
     url: "/dashboard/funds",
     icon: Wallet,
     roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
   },
   {
+    title: "Monthly Donation",
+    key: "sidebar.donate",
+    url: "/dashboard/donate",
+    icon: Heart,
+    roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MEMBER],
+  },
+  {
+    title: "My Payments",
+    key: "sidebar.myPayments",
+    url: "/dashboard/my-payments",
+    icon: Receipt,
+    roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MEMBER, UserRole.USER],
+  },
+  {
     title: "Notice Board",
+    key: "sidebar.notices",
     url: "/dashboard/notices",
     icon: Bell,
     roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
   },
   {
     title: "Capital Projects",
+    key: "sidebar.projects",
     url: "/dashboard/projects",
     icon: FolderKanban,
     roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
   },
   {
     title: "Marketing Assets",
+    key: "sidebar.banners",
     url: "/dashboard/banners",
     icon: ImageIcon,
     roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
   },
   {
     title: "Governance Board",
+    key: "sidebar.management",
     url: "/dashboard/management",
     icon: ShieldCheck,
     roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
   },
   {
     title: "Identity Settings",
+    key: "sidebar.settings",
     url: "/dashboard/settings",
     icon: Settings,
-    roles: [
-      UserRole.SUPER_ADMIN,
-      UserRole.ADMIN,
-      UserRole.MEMBER,
-      UserRole.GUEST,
-    ],
+    roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MEMBER, UserRole.USER],
   },
 ];
 
 interface AppSidebarProps {
   user: {
+    _id: string;
     name: string;
     role: UserRole;
-    profilePhoto?: string;
+    avatar?: string;
   };
 }
 
@@ -137,42 +164,33 @@ export function AppSidebar({ user }: AppSidebarProps) {
 
   const handleLogout = async () => {
     try {
-      // 1. Call backend to clear cookie
       await logoutUser({}).unwrap();
-
-      // 2. Clear Redux state
       dispatch(logout());
-
-      // 3. Reset RTK Query cache
       dispatch(baseApi.util.resetApiState());
-
-      // 4. Show success message
-      toast.success("Security session terminated successfully");
-
-      // 5. Redirect to login
+      toast.success(t("sidebar.signOutSuccess") || "Security session terminated successfully");
       router.push("/login");
     } catch (error) {
       console.error("Logout error:", error);
-      // Even if API fails, still clear local state
       dispatch(logout());
       dispatch(baseApi.util.resetApiState());
       router.push("/login");
     }
   };
 
-  //======================   SUB-COMPONENTS   ===============================
+  const currentAvatar = user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || "U")}&background=0D9488&color=fff&bold=true`;
+
   return (
     <Sidebar className="border-r border-sidebar-border bg-sidebar shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
       {/* 👤 LEADERSHIP IDENTITY PANEL */}
       <SidebarHeader className="pb-4 pt-8 px-3">
         <Link
-          href="/"
+          href="/dashboard/settings"
           className="flex items-center gap-3 hover:opacity-90 transition-all group p-3 rounded-2xl bg-sidebar-accent/10 border border-sidebar-border/50 hover:bg-sidebar-accent/20 hover:shadow-md"
         >
           <div className="relative shrink-0">
             <Avatar className="h-12 w-12 border-2 border-primary/20 shrink-0 shadow-lg ring-offset-2 ring-primary/5 transition-all duration-500 rounded-2xl group-hover:rounded-xl">
               <AvatarImage
-                src={user?.profilePhoto}
+                src={currentAvatar}
                 alt={user?.name}
                 className="object-cover"
               />
@@ -188,20 +206,39 @@ export function AppSidebar({ user }: AppSidebarProps) {
               {user?.name || "System User"}
             </span>
             <span className="text-[8px] font-black uppercase tracking-[0.2em] text-primary/70">
-              {user?.role || "GUEST"}
+              {user?.role || "USER"}
             </span>
           </div>
+        </Link>
+
+        {/* Website Home Button */}
+        <Link
+          href="/"
+          className="flex items-center gap-3 hover:opacity-90 transition-all group p-3 rounded-xl bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 hover:from-primary/20 hover:to-primary/10 hover:shadow-md mt-3"
+        >
+          <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-all">
+            <Globe className="h-5 w-5 text-primary" />
+          </div>
+          <div className="flex flex-col overflow-hidden text-left">
+            <span className="text-xs font-bold tracking-tight text-sidebar-foreground group-hover:text-primary transition-colors">
+              {t("sidebar.websiteHome") || "Website Home"}
+            </span>
+            <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+              {t("sidebar.visitSite") || "Visit Site"}
+            </span>
+          </div>
+          <ChevronRight className="h-4 w-4 text-muted-foreground ml-auto group-hover:translate-x-1 transition-transform" />
         </Link>
       </SidebarHeader>
 
       {/* 🧭 SYSTEM NAVIGATION */}
       <SidebarContent className="px-3 py-2 scrollbar-none">
         <SidebarGroup>
-          <SidebarGroupLabel className="px-4 text-[9px] font-black uppercase tracking-[0.2em] text-sidebar-foreground/20 mb-3 h-auto">
-            Strategic Oversight
+          <SidebarGroupLabel className="px-4 text-[9px] font-black uppercase tracking-[0.2em] text-sidebar-foreground/30 mb-3 h-auto">
+            {t("sidebar.strategicOversight") || "Strategic Oversight"}
           </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu className="gap-0.5">
+            <SidebarMenu className="gap-1">
               {sidebarItems
                 .filter((item) => item.roles.includes(user?.role))
                 .map((item) => {
@@ -210,10 +247,10 @@ export function AppSidebar({ user }: AppSidebarProps) {
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton
                         asChild
-                        className={`h-9 px-4 rounded-xl transition-all duration-300 relative group/menu ${
+                        className={`h-11 px-4 rounded-xl transition-all duration-300 relative group/menu ${
                           isActive
-                            ? "bg-primary text-primary-foreground shadow-md shadow-primary/20 scale-[1.02] before:content-[''] before:absolute before:left-0 before:top-1/4 before:bottom-1/4 before:w-1 before:bg-white before:rounded-full"
-                            : "text-sidebar-foreground/50 hover:bg-sidebar-accent/50 hover:text-primary active:scale-[0.98]"
+                            ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30 scale-[1.02] border border-primary-foreground/10"
+                            : "text-sidebar-foreground/60 hover:bg-primary/10 hover:text-primary active:scale-[0.98]"
                         }`}
                       >
                         <Link
@@ -221,16 +258,16 @@ export function AppSidebar({ user }: AppSidebarProps) {
                           className="flex items-center gap-3 w-full"
                         >
                           <item.icon
-                            className={`w-4 h-4 transition-all duration-300 ${isActive ? "scale-110" : "group-hover/menu:scale-110"}`}
+                            className={`w-4.5 h-4.5 transition-all duration-300 ${isActive ? "scale-110" : "group-hover/menu:scale-110"}`}
                           />
                           <span
                             className={`text-xs font-bold tracking-tight transition-all duration-300 ${isActive ? "translate-x-1" : ""}`}
                           >
-                            {item.title}
+                            {t(item.key) || item.title}
                           </span>
                           {isActive && (
                             <div className="ml-auto">
-                              <ChevronRight size={12} className="opacity-50" />
+                              <ChevronRight size={14} className="opacity-80 animate-pulse" />
                             </div>
                           )}
                         </Link>
@@ -248,10 +285,10 @@ export function AppSidebar({ user }: AppSidebarProps) {
         <Button
           variant="outline"
           onClick={handleLogout}
-          className="w-full h-10 justify-center gap-2 rounded-xl font-black text-[10px] transition-all duration-500 group border-destructive/20 text-destructive hover:bg-destructive hover:text-white"
+          className="w-full h-11 justify-center gap-2 rounded-xl font-black text-[10px] transition-all duration-500 group border-destructive/30 text-destructive hover:bg-destructive hover:text-white shadow-sm hover:shadow-destructive/20"
         >
-          <LogOut className="w-3.5 h-3.5 group-hover:rotate-12 transition-transform duration-500" />
-          <span className="uppercase tracking-[0.1em]">Sign Out</span>
+          <LogOut className="w-4 h-4 group-hover:rotate-12 transition-transform duration-500" />
+          <span className="uppercase tracking-[0.2em]">{t("sidebar.signOut") || "Sign Out"}</span>
         </Button>
       </SidebarFooter>
     </Sidebar>

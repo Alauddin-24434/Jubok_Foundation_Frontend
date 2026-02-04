@@ -123,12 +123,13 @@ export default function ManagementPage() {
       header: "Actions",
       cell: (m: any) => (
         <div className="flex gap-2 justify-end">
-          <Button size="icon" variant="ghost" onClick={() => handleEdit(m)}>
+          <Button size="icon" className="cursor-pointer" variant="ghost" onClick={() => handleEdit(m)}>
             <Edit2 size={16} />
           </Button>
           <Button
             size="icon"
             variant="ghost"
+            className="cursor-pointer"
             onClick={() => handleDelete(m._id)}
           >
             <Trash2 size={16} />
@@ -145,7 +146,7 @@ export default function ManagementPage() {
         title="Leadership Secretariat"
         description="Manage foundation leadership and governance"
         action={
-          <Button onClick={() => setIsDialogOpen(true)}>
+          <Button className="cursor-pointer" onClick={() => setIsDialogOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
             Appoint Member
           </Button>

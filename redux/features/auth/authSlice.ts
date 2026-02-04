@@ -5,7 +5,7 @@ export enum UserRole {
   SUPER_ADMIN = "SUPER_ADMIN",
   ADMIN = "ADMIN",
   MEMBER = "MEMBER",
-  GUEST = "GUEST",
+  USER = "USER",
 }
 
 export enum UserStatus {
@@ -65,10 +65,15 @@ const authSlice = createSlice({
       state.user = null;
       state.accessToken = null;
     },
+
+    // Update user info only
+    updateUser(state, action: PayloadAction<IUser>) {
+      state.user = action.payload;
+    },
   },
 });
 
-export const { setUser, logout } = authSlice.actions;
+export const { setUser, logout, updateUser } = authSlice.actions;
 export default authSlice.reducer;
 
 // Selectors

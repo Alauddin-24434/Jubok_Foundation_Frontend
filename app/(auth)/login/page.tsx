@@ -74,8 +74,8 @@ export default function LoginPage() {
 
       <p className="text-center text-sm mt-6">
         Don't have an account?{" "}
-        <Link href="/signup" className="text-primary font-medium">
-          Sign up
+        <Link href="/register" className="text-primary font-medium">
+          Apply for Membership
         </Link>
       </p>
     </Card>

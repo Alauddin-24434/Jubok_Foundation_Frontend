@@ -40,6 +40,29 @@ export default function DashboardLayout({
   const { t, i18n } = useTranslation();
   const { theme, setTheme } = useTheme();
 
+  //======================   SECURITY ENFORCEMENT   ===============================
+  useEffect(() => {
+    // 1. Redirect to login if not authenticated
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+
+    // 2. Protect restricted routes for non-members (USER role)
+    const isMember = user.role === "MEMBER" || user.role === "ADMIN" || user.role === "SUPER_ADMIN";
+    const pathname = window.location.pathname;
+
+    // List of restricted paths (starts with /dashboard/ but not /dashboard/membership and not just /dashboard)
+    const isRestrictedPath = pathname.startsWith("/dashboard/") && 
+                           pathname !== "/dashboard/membership" && 
+                           pathname !== "/dashboard/settings" &&
+                           pathname !== "/dashboard";
+
+    if (!isMember && isRestrictedPath) {
+      router.push("/dashboard"); // Redirect to home where activation prompt is shown
+    }
+  }, [user, router]);
+
   //======================   RENDER HELPERS   ===============================
   return (
     <SidebarProvider>

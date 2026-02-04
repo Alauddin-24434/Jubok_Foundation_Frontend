@@ -101,8 +101,6 @@ export default function NoticePage() {
 
   // ================= DELETE =================
   const handleDelete = async (id: string) => {
-  
-
     try {
       await deleteNotice(id).unwrap();
       toast.success("Notice deleted");
@@ -151,25 +149,26 @@ export default function NoticePage() {
         title="Notice Board"
         description="Manage public notices & circulars"
         action={
-          <Button onClick={() => setOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />
+          <Button onClick={() => setOpen(true)} className="cursor-pointer">
+            <Plus className="h-4 w-4 mr-2 " />
             New Notice
           </Button>
         }
       />
+      <div className="rounded-2xl overflow-hidden bg-card border border-muted/30 shadow-2xl p-6">
+        <AFSearchFilters
+          searchValue={search}
+          onSearchChange={setSearch}
+          searchPlaceholder="Search notice..."
+        />
 
-      <AFSearchFilters
-        searchValue={search}
-        onSearchChange={setSearch}
-        searchPlaceholder="Search notice..."
-      />
-
-      <AFDataTable
-        columns={columns}
-        data={filteredNotices}
-        isLoading={isLoading}
-        emptyMessage="No notices found"
-      />
+        <AFDataTable
+          columns={columns}
+          data={filteredNotices}
+          isLoading={isLoading}
+          emptyMessage="No notices found"
+        />
+      </div>
 
       {/* ================= MODAL ================= */}
       <AFModal isOpen={open} onOpenChange={setOpen} title="Create Notice">
@@ -225,12 +224,13 @@ export default function NoticePage() {
 
           {/* ACTIONS */}
           <div className="flex justify-end gap-2 pt-4">
-            <Button variant="outline" onClick={() => setOpen(false)}>
+            <Button variant="outline" className="cursor-pointer" onClick={() => setOpen(false)}>
               Cancel
             </Button>
 
             <Button
               onClick={handleCreate}
+              className="cursor-pointer"
               disabled={creating || isUploading || !fileUrl}
             >
               {creating ? "Publishing..." : "Publish"}

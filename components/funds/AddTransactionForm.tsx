@@ -22,7 +22,7 @@ export const AddTransactionForm = ({
   onAdd,
   adding,
 }: AddTransactionFormProps) => {
-  const [txType, setTxType] = useState<"INCOME" | "EXPENSE">("INCOME");
+  const [txType, setTxType] = useState<"INCOME" | "EXPENSE">("EXPENSE");
   const [txAmount, setTxAmount] = useState("");
   const [txReason, setTxReason] = useState("");
   const [evidenceImages, setEvidenceImages] = useState<File[]>([]);
@@ -100,7 +100,7 @@ export const AddTransactionForm = ({
       // Reset Form
       setTxAmount("");
       setTxReason("");
-      setTxType("INCOME");
+      setTxType("EXPENSE");
       setEvidenceImages([]);
       setUploadProgress(0);
     } catch (error) {
@@ -111,9 +111,9 @@ export const AddTransactionForm = ({
   return (
     <>
       <Card className="border-2 border-emerald-100 shadow-md">
-        <CardHeader className="bg-emerald-50/50">
+        <CardHeader className="border-b">
           <CardTitle className="text-lg text-emerald-700">
-            Add Fund Transaction
+            Record Manual Expense
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6 pt-6">
@@ -173,7 +173,7 @@ export const AddTransactionForm = ({
                     />
                     <button
                       onClick={() => removeImage(index)}
-                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute top-1 cursor-pointer right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
                     >
                       <X className="w-3 h-3" />
                     </button>
@@ -185,15 +185,9 @@ export const AddTransactionForm = ({
 
           {/* ইনপুট গ্রিড */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <select
-              value={txType}
-              disabled={isUploading || adding}
-              onChange={(e) => setTxType(e.target.value as any)}
-              className="border rounded-md px-3 h-10 bg-white disabled:bg-gray-100"
-            >
-              <option value="INCOME">INCOME</option>
-              <option value="EXPENSE">EXPENSE</option>
-            </select>
+            <div className="flex items-center justify-center border rounded-md px-3 h-10 bg-rose-50 text-rose-700 font-black text-xs uppercase tracking-widest border-rose-100">
+              EXPENSE
+            </div>
 
             <Input
               type="number"
@@ -213,7 +207,7 @@ export const AddTransactionForm = ({
             <Button
               onClick={handleSubmit}
               disabled={adding || isUploading}
-              className="bg-emerald-600 hover:bg-emerald-800 text-white font-bold h-10"
+              className="bg-emerald-600 cursor-pointer hover:bg-emerald-800 text-white font-bold h-10"
             >
               {adding || isUploading ? (
                 <>
@@ -221,7 +215,7 @@ export const AddTransactionForm = ({
                   Please Wait
                 </>
               ) : (
-                "Add Transaction"
+                "Add Expense Entry"
               )}
             </Button>
           </div>
